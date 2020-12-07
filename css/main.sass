@@ -3,7 +3,41 @@
 	padding: 0
 	box-sizing: border-box
 	font-family: 'Inconsolata'
+
+
+header
+	height: 60px
+	padding: 10px
+	width: 100%
+	display: flex
+	justify-content: space-between
+	align-items: center
+	border-bottom: 1px solid rgba(0,0,0,0.1)
+	margin-bottom: 20px
 	
+.header-logo
+	background-image: url("../assets/logo.svg")
+	background-size: contain
+	background-position: center center
+	background-repeat: no-repeat
+	height: 40px
+	width: 40px
+	
+.header-options
+	display: flex
+	flex-direction: row
+	flex-wrap: nowrap
+	justify-content: space-between
+	align-items: center
+	
+.header-option:not(:last-child)
+	margin-right: 20px
+
+
+
+
+
+
 h2
 	margin-bottom: 10px
 

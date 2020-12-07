@@ -4,8 +4,8 @@
 
 <html>
 	<head>
-		<script type="text/javascript" src="../js/jquerylib.js"></script>
-		<script type="text/javascript" src="../js/js_helpers.js"></script>
+		<script type="text/javascript" src="js/jquerylib.js"></script>
+		<script type="text/javascript" src="js/js_helpers.js"></script>
 		<script src="https://d3js.org/d3.v5.min.js"></script>
 		
 		<link rel='stylesheet' type='text/css' href='css/main.css' />
@@ -13,6 +13,15 @@
 		<link href="https://fonts.googleapis.com/css?family=Inconsolata&display=swap" rel="stylesheet">
 	</head>
 	<body>
+		
+		<header>
+			<div class='header-logo'></div>
+			<div class='header-options'>
+				<a class='header-option'>tool</a>
+				<a class='header-option'>API</a>
+				<a class='header-option'>contact</a>
+			</div>
+		</header>
 		
 		<div class='content'>
 			<h2>option value</h2>
@@ -22,23 +31,23 @@
 					<h3>inputs</h3>
 					<div class='input-wrapper'>
 						<p class='input-label'>stock price</p>
-						<input class='valuation-input S' placeholder='S' value=57.63 />
+						<input class='valuation-input S' placeholder='S' value=10 />
 					</div>
 					<div class='input-wrapper'>
 						<p class='input-label'>exercise price</p>
-						<input class='valuation-input K' placeholder='K' value=40 />
+						<input class='valuation-input K' placeholder='K' value=10 />
 					</div>
 					<div class='input-wrapper'>
 						<p class='input-label'>interest rate</p>
-						<input class='valuation-input r' placeholder='r' value=0.0095 />
+						<input class='valuation-input r' placeholder='r' value=0.01 />
 					</div>
 					<div class='input-wrapper'>
 						<p class='input-label'>days to exp.</p>
-						<input class='valuation-input t' placeholder='t' value=9 />
+						<input class='valuation-input t' placeholder='t' value=10 />
 					</div>
 					<div class='input-wrapper'>
 						<p class='input-label'>volatility</p>
-						<input class='valuation-input vol' placeholder='s' value=1.942 />
+						<input class='valuation-input vol' placeholder='s' value=1.0 />
 					</div>
 					
 					
@@ -133,8 +142,8 @@
 	// what it should actually do is allow the input of any 5 of 6 variables and solve for the missing one.
 	//	if all 6 are given, the model should assert that the option is over- or under-priced.
 	
-	//tooltips for the D3 dots
-	//tooltips for the greeks and other outputs
+	// tooltips for the D3 dots
+	// tooltips for the greeks and other outputs
 	
 	$(".input-panel.valuation > .submit").click(function() {
 		var S = $(".valuation-input.S").val().trim(),
@@ -163,7 +172,7 @@
 				data: data,
 				success: function(d) {
 					
-					//console.log(d);
+					console.log(d);
 					d = JSON.parse(d);
 					console.log(d);
 					
@@ -280,10 +289,6 @@
 	var t = d3.transition()
       .duration(750);
       
-      
-      
-      
-      
     var svg_1 = d3.select(".svg-container.call-valuation > svg.sensitivity-v-wrt-s")
 	    .attr("width", width + margin.left + margin.right)
 	    .attr("height", height + margin.top + margin.bottom);
@@ -334,8 +339,6 @@
     var g_6 = svg_6.append("g")
     	.attr("transform","translate(" + margin.left + "," + margin.top + ")")
     	.attr("class","wrapper");
-    	
-    	
     	
     function init_axes(
     	g,
