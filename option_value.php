@@ -1,19 +1,14 @@
 <?php
 	
-	
-	//ini_set('display_errors', 1);
-	//ini_set('display_startup_errors', 1);
-	//error_reporting(E_ALL);
-	
 	include "options_functions.php";
 	
-	$days_in_year = 360;
+	$days_in_year = isset($_GET["days_in_year"]) ? $_GET["days_in_year"] : 365;
 
-	$S = isset($_GET["S"]) ? $_GET["S"] : 57.63;	//current stock price
-	$K = isset($_GET["K"]) ? $_GET["K"] : 40;		//strike price
-	$r = isset($_GET["r"]) ? $_GET["r"] : .0094;	//short-term risk-free interest rate
-	$t = isset($_GET["t"]) ? $_GET["t"] : 9;		//time to expiration
-	$s = isset($_GET["s"]) ? $_GET["s"] : 1.942;	//volatility (sd of S)
+	$S = isset($_GET["S"]) ? $_GET["S"] : 100;		//current asset price
+	$K = isset($_GET["K"]) ? $_GET["K"] : 100;		//option exercise price
+	$r = isset($_GET["r"]) ? $_GET["r"] : 1/100;	//short-term risk-free interest rate
+	$t = isset($_GET["t"]) ? $_GET["t"] : 9;		//days to expiration
+	$s = isset($_GET["s"]) ? $_GET["s"] : 80/100;	//volatility
 	
 	$t = $t / $days_in_year;
 	
@@ -28,5 +23,4 @@
 	$val["sensitivity_V_wrt_t"] = $sen_t;
 	
 	echo json_encode($val);
-	//echo erf(1);
 ?>
