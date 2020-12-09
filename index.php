@@ -14,14 +14,7 @@
 	</head>
 	<body>
 		
-		<header>
-			<div class='header-logo'></div>
-			<div class='header-options'>
-				<a class='header-option'>tool</a>
-				<a class='header-option'>API</a>
-				<a class='header-option'>contact</a>
-			</div>
-		</header>
+		<?php include "templates/header.html"; ?>
 		
 		<div class='content'>
 			<h2>option value</h2>
@@ -30,7 +23,7 @@
 				<div class='input-panel valuation'>
 					<h3>inputs</h3>
 					<div class='input-wrapper'>
-						<p class='input-label'>stock price</p>
+						<p class='input-label'>asset price</p>
 						<input class='valuation-input S' placeholder='S' value=10 />
 					</div>
 					<div class='input-wrapper'>
@@ -38,16 +31,16 @@
 						<input class='valuation-input K' placeholder='K' value=10 />
 					</div>
 					<div class='input-wrapper'>
-						<p class='input-label'>interest rate</p>
-						<input class='valuation-input r' placeholder='r' value=0.01 />
+						<p class='input-label'>interest rate %</p>
+						<input class='valuation-input r' placeholder='r' value=1 />
 					</div>
 					<div class='input-wrapper'>
 						<p class='input-label'>days to exp.</p>
 						<input class='valuation-input t' placeholder='t' value=10 />
 					</div>
 					<div class='input-wrapper'>
-						<p class='input-label'>volatility</p>
-						<input class='valuation-input vol' placeholder='s' value=1.0 />
+						<p class='input-label'>volatility %</p>
+						<input class='valuation-input vol' placeholder='s' value=80 />
 					</div>
 					
 					
@@ -125,7 +118,7 @@
 			
 			
 			
-			
+			<?php include "templates/footer.html"; ?>
 			
 			
 		</div>
@@ -153,7 +146,7 @@
 			vol = $(".valuation-input.vol").val().trim();
 			
 		if (S == "") {
-			throw_error("stock price must be provided.");
+			throw_error("asset price must be provided.");
 		} else if(K == "") {
 			throw_error("exercise price must be provided.");
 		} else if(r == "") {
