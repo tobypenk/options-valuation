@@ -1,8 +1,6 @@
 <?php
 
-	//default type should be 'both'
-
-	function black_scholes($S,$K,$r,$t,$s,$type='call') {
+	function black_scholes($S,$K,$r,$t,$s,$type='both') {
 
 		if ($type == 'call') {
 			return ['call' => black_scholes_call($S,$K,$r,$t,$s)];
@@ -17,37 +15,56 @@
 			trigger_error("parameter 'type' in function 'black_scholes' accepts only the values: 'call', 'put', or 'both'. '" . $type . "' was provided.");
 		}
 	}
-
+	
+	
+	
+	
+	
 	function erf($x) {
-
-		/*$p = 0.47047;
-		$a1 = 0.3480242;
-		$a2 = -0.0958798;
-		$a3 = 0.7478556;
-		$t = 1/(1+$p*$x);
-		$er =  1 - exp(-pow($x,2))*($a1*$t + $a2*pow($t,2) + $a3*pow($t,3));*/
-
-		$p = 0.3275911;
-		$a1 = 0.254829592;
-		$a2 = -0.284496736;
-		$a3 = 1.421413741;
-		$a4 = -1.453152027;
-		$a5 = 1.061405429;
-
-		$t = 1/(1+$p*$x);
-
-		$er = 1 -
-			exp(-pow($x,2)) *
-			(
-				$a1*$t +
-				$a2*pow($t,2) +
-				$a3*pow($t,3) +
-				$a4*pow($t,4) +
-				$a5*pow($t,5)
-			);
-
-		return $er;
+		if (is_negative($x)) {
+			return tau($x) - 1;
+		} else {
+			return 1 - tau($x);
+		}
 	}
+	
+	function t($x) {
+		return 1 / (1 + 0.5*abs($x));
+	}
+	
+	function tau($x) {
+		
+		$t = t($x);
+		$a1 = -1.26551223;
+		$a2 = 1.00002368;
+		$a3 = 0.37409196;
+		$a4 = 0.09678418;
+		$a5 = -0.18628806;
+		$a6 = 0.27886807;
+		$a7 = -1.13520398;
+		$a8 = 1.48851587;
+		$a9 = -0.82215223;
+		$a10 = 0.17087277;
+		
+		return $t * exp(
+			-pow($x,2) +
+			$a1 +
+			$a2 * pow($t,1) + 
+			$a3 * pow($t,2) + 
+			$a4 * pow($t,3) + 
+			$a5 * pow($t,4) + 
+			$a6 * pow($t,5) + 
+			$a7 * pow($t,6) + 
+			$a8 * pow($t,7) + 
+			$a9 * pow($t,8) + 
+			$a10 * pow($t,9)
+		);
+	}
+	
+
+
+
+
 
 	function phi($x) {
 		return exp(-pow($x,2)/2) / sqrt(2 * pi());
