@@ -118,10 +118,11 @@
 			
 			
 			
-			<?php include "templates/footer.html"; ?>
+			
 			
 			
 		</div>
+		<?php include "templates/footer.html"; ?>
 	</body>
 </html>
 
