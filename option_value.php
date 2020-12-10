@@ -21,6 +21,13 @@
 	$val["sensitivity_V_wrt_S"] = $sen_S;
 	$val["sensitivity_V_wrt_vol"] = $sen_vol;
 	$val["sensitivity_V_wrt_t"] = $sen_t;
+	$val["args"] = [
+		"S"=>$S,
+		"K"=>$K,
+		"r"=>$r,
+		"t"=>$t,
+		"s"=>$s
+	];
 	
 	echo json_encode($val);
 	
