@@ -16,10 +16,6 @@
 		}
 	}
 	
-	
-	
-	
-	
 	function erf($x) {
 		if (is_negative($x)) {
 			return tau($x) - 1;
@@ -61,11 +57,6 @@
 		);
 	}
 	
-
-
-
-
-
 	function phi($x) {
 		return exp(-pow($x,2)/2) / sqrt(2 * pi());
 	}
