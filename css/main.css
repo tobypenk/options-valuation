@@ -5,7 +5,7 @@
   font-family: "Inconsolata";
 }
 
-p {
+.header-paragraph {
   margin-top: 20px;
   margin-bottom: 20px;
 }
@@ -17,15 +17,16 @@ header, footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
 }
 
 header {
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
 }
 
 footer {
   border-top: 1px solid rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
 }
 
 .header-logo {
@@ -146,6 +147,10 @@ body {
   content: "S";
   width: 30px;
   height: 20px;
+}
+
+.svg-container {
+  padding-top: 20px;
 }
 
 .line {

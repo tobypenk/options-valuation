@@ -42,6 +42,12 @@ var S = 10, //current asset price
 	t = 5,  //days to option expiration
 	v = 80, //current asset volatility in % (will be divided by 100 by the API)
 	days_in_year = 365 //optionally set the length of the year (default 365)
+	
+	$.ajax({
+		method: "GET",
+		url: "optoprice.com/api/fetch_value",
+		
+	})
 </pre>
 			</div>
 		</div>

@@ -349,7 +349,7 @@
 		
 		if ((abs($V-$v) <= $precision) || $iterations == $max_iterations) {
 			return [
-				'iv' => $s,
+				's' => $s,
 				'iterations' => $iterations
 			];
 		} else {

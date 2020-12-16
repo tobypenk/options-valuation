@@ -18,7 +18,9 @@
 		
 		<div class='content'>
 			<h1>no-frills option valuation</h1>
-			<p>this tool can be used for inline testing of the api. for more thorough testing you can <a href='/api'>create an api key</a>.</p>
+			<p class='header-paragraph'>use this package to conduct option analysis given fundamental inputs. create a
+				pull request or contact me directly with bugs or feature requests.
+			</p>
 			<h2>option value</h2>
 		
 			<div class='numeric-panel valuation'>
@@ -54,6 +56,7 @@
 				</div>
 				
 				<div class='output-panels valuation'>
+					
 					<div class='output-panel call'>
 						<h3>call</h3>
 						<div class='valuation-output value'>
@@ -76,6 +79,7 @@
 						</div>
 						
 						<div class='svg-container call-valuation'>
+							<h3>call sensitivities</h3>
 							<svg class='sensitivity-v-wrt-s'></svg>
 							<svg class='sensitivity-v-wrt-vol'></svg>
 							<svg class='sensitivity-v-wrt-t'></svg>
@@ -107,6 +111,7 @@
 						</div>
 						
 						<div class='svg-container put-valuation'>
+							<h3>put sensitivities</h3>
 							<svg class='sensitivity-v-wrt-s'></svg>
 							<svg class='sensitivity-v-wrt-vol'></svg>
 							<svg class='sensitivity-v-wrt-t'></svg>
@@ -150,14 +155,14 @@
 					<div class='output-panel call'>
 						<h3>call</h3>
 						<div class='implied-volatility-output s'>
-							<p>s:</p><p class='val'></p>
+							<p>s %:</p><p class='val'></p>
 						</div>
 					</div>
 					
 					<div class='output-panel put'>
 						<h3>put</h3>
 						<div class='implied-volatility-output s'>
-							<p>s:</p><p class='val'></p>
+							<p>s %:</p><p class='val'></p>
 						</div>
 					</div>
 				</div>
@@ -177,10 +182,19 @@
 	// what it should actually do is allow the input of any 5 of 6 variables and solve for the missing one.
 	//	if all 6 are given, the model should assert that the option is over- or under-priced.
 	
-	// tooltips for the D3 dots
-	// tooltips for the greeks and other outputs
+	valuation_submit();
+	implied_volatility_submit();
+	
 	
 	$(".input-panel.valuation > .submit").click(function() {
+		valuation_submit();
+	});
+	
+	$(".valuation-input").blur(function(){
+		valuation_submit();
+	})
+	
+	function valuation_submit() {
 		var S = $(".valuation-input.S").val().trim(),
 			K = $(".valuation-input.K").val().trim(),
 			r = $(".valuation-input.r").val().trim(),
@@ -200,7 +214,6 @@
 		} else {
 			
 			var data = {S:S,K:K,r:r,t:t,s:vol};
-			//console.log(data);
 			$.ajax({
 				url: "option_value.php",
 				method: "GET",
@@ -291,13 +304,20 @@
 					);
 					
 					d3_is_init = false;
-					
 				}
 			});
 		}
-	});
+	}
 	
 	$(".input-panel.implied-volatility > .submit").click(function() {
+		implied_volatility_submit();
+	});
+	
+	$(".implied-volatility-input").blur(function(){
+		implied_volatility_submit();
+	})
+	
+	function implied_volatility_submit() {
 		var S = $(".implied-volatility-input.S").val().trim(),
 			K = $(".implied-volatility-input.K").val().trim(),
 			r = $(".implied-volatility-input.r").val().trim(),
@@ -331,16 +351,15 @@
 					
 					for (type of ["call","put"]) {
 						for (field of ["s"]) {
-							val = (Math.round(d[type][field]*1e4)/1e4).toFixed(4);
+							val = (Math.round(d[type][field]*1e6)/1e4).toFixed(4);
 							$(".output-panel."+type+" .implied-volatility-output."+field+" p.val").html(val);
 						}
 					}
 				}
 			});
 		}
-	});
 
-	
+	}
 	
 	function throw_error(message) {
 		console.log(message);
@@ -710,17 +729,3 @@
     
     
 </script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
