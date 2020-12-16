@@ -67,9 +67,10 @@
 
 	function normal_cdf($z) {
 
-		$r = 0.5 + erf(abs($z) / sqrt(2)) / 2;
+		//$r = 0.5 + erf(abs($z) / sqrt(2)) / 2;
 
-		return is_negative($z) ? 1 - $r : $r;
+		//return is_negative($z) ? 1 - $r : $r;
+		return (1+erf($z/sqrt(2)))/2;
 	}
 
 	function black_scholes_d1($S,$K,$r,$t,$s) {
@@ -329,17 +330,18 @@
 		}
 	}
 
-	// these don't need to be two separate functions
-	function implied_volatility_call($S,$K,$V,$r,$t,$s=1.0,$precision=0.0001,$increment=0.1,$iterations=0) {
+	// these may not need to be two separate functions, or at least there should be less repetitiveness
+	// previous functions should be disaggretated so the elements can be called without repetitiveness OR unnecessary computation
+	function implied_volatility_call($S,$K,$V,$r,$t,$s=1.0,$precision=1e-5,$increment=0.1,$iterations=0) {
 
-		$d1 = black_scholes_d1($S,$K,$r,$t,$s);
-		$d2 = black_scholes_d2($s,$t,$d1);
+		//$d1 = black_scholes_d1($S,$K,$r,$t,$s);
+		//$d2 = black_scholes_d2($s,$t,$d1);
 
-		$n1 = normal_cdf($d1);
-		$n2 = normal_cdf($d2);
-		$v = $S * $n1 - $K * exp(-$r * $t) * $n2;
-
-		//echo abs($V-$v); echo "\r\n"; echo $iterations; echo "\r\n\r\n";
+		//$n1 = normal_cdf($d1);
+		//$n2 = normal_cdf($d2);
+		//$v = $S * $n1 - $K * exp(-$r * $t) * $n2;
+		
+		$v = black_scholes_call($S,$K,$r,$t,$s)["value"];
 
 		if ((abs($V-$v) <= $precision) || $iterations == 10000) {
 
@@ -354,16 +356,16 @@
 		}
 	}
 
-	function implied_volatility_put($S,$K,$V,$r,$t,$s=1.0,$precision=0.0001,$increment=0.1,$iterations=0) {
+	function implied_volatility_put($S,$K,$V,$r,$t,$s=1.0,$precision=1e-5,$increment=0.1,$iterations=0) {
 
-		$d1 = black_scholes_d1($S,$K,$r,$t,$s);
-		$d2 = black_scholes_d2($s,$t,$d1);
+		//$d1 = black_scholes_d1($S,$K,$r,$t,$s);
+		//$d2 = black_scholes_d2($s,$t,$d1);
 
-		$n1p = normal_cdf(-$d1);
-		$n2p = normal_cdf(-$d2);
-		$v = $K * exp(-$r * $t) * $n2p - $S * $n1p;
-
-		//echo abs($V-$v); echo "\r\n"; echo $iterations; echo "\r\n\r\n";
+		//$n1p = normal_cdf(-$d1);
+		//$n2p = normal_cdf(-$d2);
+		//$v = $K * exp(-$r * $t) * $n2p - $S * $n1p;
+		
+		$v = black_scholes_put($S,$K,$r,$t,$s)["value"];
 
 		if ((abs($V-$v) <= $precision) || $iterations == 10000) {
 
