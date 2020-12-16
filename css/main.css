@@ -5,6 +5,11 @@
   font-family: "Inconsolata";
 }
 
+p {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
 header, footer {
   height: 60px;
   padding: 10px;
@@ -12,7 +17,6 @@ header, footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   margin-bottom: 20px;
 }
 
@@ -92,7 +96,8 @@ body {
   width: 50%;
 }
 
-.valuation-output {
+.valuation-output,
+.implied-volatility-output {
   width: 60%;
   border-bottom: 1px solid black;
 }
@@ -129,7 +134,8 @@ body {
   cursor: pointer;
 }
 
-.valuation-output {
+.valuation-output,
+.implied-volatility-output {
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;

@@ -17,6 +17,8 @@
 		<?php include "templates/header.html"; ?>
 		
 		<div class='content'>
+			<h1>no-frills option valuation</h1>
+			<p>this tool can be used for inline testing of the api. for more thorough testing you can <a href='/api'>create an api key</a>.</p>
 			<h2>option value</h2>
 		
 			<div class='numeric-panel valuation'>
@@ -46,8 +48,8 @@
 					
 					
 					
-					<div class='submit'>
-						<p>submit</p>
+					<div class='submit valuation'>
+						<p>calculate</p>
 					</div>
 				</div>
 				
@@ -115,12 +117,51 @@
 			
 			<h2>implied volatility</h2>
 			
-			
-			
-			
-			
-			
-			
+			<div class='numeric-panel implied-volatility'>
+				<div class='input-panel implied-volatility'>
+					<h3>inputs</h3>
+					<div class='input-wrapper'>
+						<p class='input-label'>asset price</p>
+						<input class='implied-volatility-input S' placeholder='S' value=10 />
+					</div>
+					<div class='input-wrapper'>
+						<p class='input-label'>exercise price</p>
+						<input class='implied-volatility-input K' placeholder='K' value=10 />
+					</div>
+					<div class='input-wrapper'>
+						<p class='input-label'>interest rate %</p>
+						<input class='implied-volatility-input r' placeholder='r' value=1 />
+					</div>
+					<div class='input-wrapper'>
+						<p class='input-label'>days to exp.</p>
+						<input class='implied-volatility-input t' placeholder='t' value=10 />
+					</div>
+					<div class='input-wrapper'>
+						<p class='input-label'>option premium</p>
+						<input class='implied-volatility-input V' placeholder='V' value=0.56 />
+					</div>
+					
+					<div class='submit implied-volatility'>
+						<p>calculate</p>
+					</div>
+				</div>
+				
+				<div class='output-panels implied-volatility'>
+					<div class='output-panel call'>
+						<h3>call</h3>
+						<div class='implied-volatility-output s'>
+							<p>s:</p><p class='val'></p>
+						</div>
+					</div>
+					
+					<div class='output-panel put'>
+						<h3>put</h3>
+						<div class='implied-volatility-output s'>
+							<p>s:</p><p class='val'></p>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 		<?php include "templates/footer.html"; ?>
 	</body>
@@ -174,13 +215,10 @@
 					
 					for (type of ["call","put"]) {
 						for (field of ["value","delta","gamma","theta","vega","rho"]) {
-							
 							val = (Math.round(d[type][field]*1e4)/1e4).toFixed(4);
 							$(".output-panel."+type+" .valuation-output."+field+" p.val").html(val);
 						}
 					}
-					
-
 					
 					d3_draw_line(
 						".svg-container.call-valuation > svg.sensitivity-v-wrt-s",
@@ -258,6 +296,50 @@
 			});
 		}
 	});
+	
+	$(".input-panel.implied-volatility > .submit").click(function() {
+		var S = $(".implied-volatility-input.S").val().trim(),
+			K = $(".implied-volatility-input.K").val().trim(),
+			r = $(".implied-volatility-input.r").val().trim(),
+			t = $(".implied-volatility-input.t").val().trim(),
+			V = $(".implied-volatility-input.V").val().trim();
+			
+		if (S == "") {
+			throw_error("asset price must be provided.");
+		} else if(K == "") {
+			throw_error("exercise price must be provided.");
+		} else if(r == "") {
+			throw_error("interest rate must be provided.");
+		} else if(t == "") {
+			throw_error("period must be provided.");
+		} else if(V == "") {
+			throw_error("option premium must be provided.");
+		} else {
+			
+			var data = {S:S,K:K,r:r,t:t,V:V};
+			$.ajax({
+				url: "implied_volatility.php",
+				method: "GET",
+				data: data,
+				success: function(d) {
+					
+					console.log(d);
+					d = JSON.parse(d);
+					console.log(d);
+					
+					var val, type, field;
+					
+					for (type of ["call","put"]) {
+						for (field of ["s"]) {
+							val = (Math.round(d[type][field]*1e4)/1e4).toFixed(4);
+							$(".output-panel."+type+" .implied-volatility-output."+field+" p.val").html(val);
+						}
+					}
+				}
+			});
+		}
+	});
+
 	
 	
 	function throw_error(message) {

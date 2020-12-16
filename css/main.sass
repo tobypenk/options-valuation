@@ -4,6 +4,9 @@
 	box-sizing: border-box
 	font-family: 'Inconsolata'
 
+p
+	margin-top: 20px
+	margin-bottom: 20px
 
 header, footer
 	height: 60px
@@ -12,7 +15,6 @@ header, footer
 	display: flex
 	justify-content: space-between
 	align-items: center
-	border-bottom: 1px solid rgba(0,0,0,0.1)
 	margin-bottom: 20px
 	
 header
@@ -84,7 +86,8 @@ body
 .output-panel
 	width: 50%
 	
-.valuation-output
+.valuation-output,
+.implied-volatility-output
 	width: 60%
 	border-bottom: 1px solid black
 	
@@ -116,14 +119,15 @@ body
 	background-color: tomato
 	cursor: pointer
 	
-.valuation-output
+.valuation-output,
+.implied-volatility-output
 	display: flex
 	flex-direction: row
 	flex-wrap: nowrap
 	justify-content: space-between
 	
 	
-.valuation-input.S::before
+.valuation-input.S::before 
 	content: "S"
 	width: 30px
 	height: 20px
