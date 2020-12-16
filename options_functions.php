@@ -312,73 +312,49 @@
 		return $total;
 	}
 
-	function implied_volatility($S,$K,$V,$r,$t,$type='both',$s_init=1.0,$precision=0.0001,$increment=0.1) {
-
-		$s = $s_init;
+	
+	function implied_volatility(
+		$S,$K,$V,$r,$t,
+		$type='both',
+		$s=1.0,
+		$precision=1e-4,$increment=0.1,$max_iterations=1e4
+	) {
 
 		if ($type == 'call') {
-			return ['call' => implied_volatility_call($S,$K,$V,$r,$t,$s,$precision,$increment)];
+			return ['call' => implied_volatility_calc($S,$K,$V,$r,$t,'call',$s,$precision,$increment,$max_iterations)];
 		} else if ($type == 'put') {
-			return ['put' => implied_volatility_put($S,$K,$V,$r,$t,$s,$precision,$increment)];
+			return ['put' => implied_volatility_calc($S,$K,$V,$r,$t,'put',$s,$precision,$increment,$max_iterations)];
 		} else if ($type == 'both') {
 			return [
-				'call' => implied_volatility_call($S,$K,$V,$r,$t,$s,$precision,$increment),
-				'put' => implied_volatility_put($S,$K,$V,$r,$t,$s,$precision,$increment)
+				'call' => implied_volatility_calc($S,$K,$V,$r,$t,'call',$s,$precision,$increment,$max_iterations),
+				'put' => implied_volatility_calc($S,$K,$V,$r,$t,'put',$s,$precision,$increment,$max_iterations)
 			];
 		} else {
-			trigger_error("parameter 'type' in function 'implied_volatility' accepts only the values: 'call', 'put', or 'both'. '" . $type . "' was provided.");
+			trigger_error(
+				"parameter 'type' in function 'implied_volatility' ".
+				"accepts only the values: 'call', 'put', or 'both'. '" . $type . "' was provided."
+			);
 		}
 	}
 
-	// these may not need to be two separate functions, or at least there should be less repetitiveness
-	// previous functions should be disaggretated so the elements can be called without repetitiveness OR unnecessary computation
-	function implied_volatility_call($S,$K,$V,$r,$t,$s=1.0,$precision=1e-5,$increment=0.1,$iterations=0) {
-
-		//$d1 = black_scholes_d1($S,$K,$r,$t,$s);
-		//$d2 = black_scholes_d2($s,$t,$d1);
-
-		//$n1 = normal_cdf($d1);
-		//$n2 = normal_cdf($d2);
-		//$v = $S * $n1 - $K * exp(-$r * $t) * $n2;
+	function implied_volatility_calc(
+		$S,$K,$V,$r,$t,
+		$type,
+		$s,
+		$precision,$increment,$max_iterations,
+		$iterations=0
+	) {
 		
-		$v = black_scholes_call($S,$K,$r,$t,$s)["value"];
-
-		if ((abs($V-$v) <= $precision) || $iterations == 10000) {
-
+		$v = option_value($S,$K,$r,$t,$s,$type);
+		
+		if ((abs($V-$v) <= $precision) || $iterations == $max_iterations) {
 			return [
-				'call_iv' => $s,
+				'iv' => $s,
 				'iterations' => $iterations
 			];
 		} else {
 			$s = $s + $increment * ($V/$v - 1);
-
-			return implied_volatility_call($S,$K,$V,$r,$t,$s,$precision,$increment,$iterations+1);
-		}
-	}
-
-	function implied_volatility_put($S,$K,$V,$r,$t,$s=1.0,$precision=1e-5,$increment=0.1,$iterations=0) {
-
-		//$d1 = black_scholes_d1($S,$K,$r,$t,$s);
-		//$d2 = black_scholes_d2($s,$t,$d1);
-
-		//$n1p = normal_cdf(-$d1);
-		//$n2p = normal_cdf(-$d2);
-		//$v = $K * exp(-$r * $t) * $n2p - $S * $n1p;
-		
-		$v = black_scholes_put($S,$K,$r,$t,$s)["value"];
-
-		if ((abs($V-$v) <= $precision) || $iterations == 10000) {
-
-			return [
-				'put_iv' => $s,
-				'iterations' => $iterations
-			];
-
-		} else {
-
-			$s = $s + $increment * ($V/$v - 1);
-
-			return implied_volatility_put($S,$K,$V,$r,$t,$s,$precision,$increment,$iterations+1);
+			return implied_volatility_calc($S,$K,$V,$r,$t,$type,$s,$precision,$increment,$max_iterations,$iterations+1);
 		}
 	}
 
