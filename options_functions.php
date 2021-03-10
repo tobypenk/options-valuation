@@ -2,6 +2,8 @@
 
 	function black_scholes($S,$K,$r,$t,$s,$type='both') {
 		/*
+			api function for black scholes valuation
+			
 			parameters:
 				S: asset price
 				K: option exercise / strike price
@@ -29,6 +31,17 @@
 	}
 	
 	function erf($x) {
+		
+		/*
+			error function (for use calculating normal cdf)
+			
+			parameters: 
+				x: z-score
+				
+			returns: 
+				approximate error function output value for x
+		*/
+		
 		if (is_negative($x)) {
 			return tau($x) - 1;
 		} else {
@@ -37,10 +50,29 @@
 	}
 	
 	function t($x) {
+		
+		/*
+			helper for error function approximation (for use calculating normal cdf)
+			parameters: 
+				x: z-score
+				
+			returns: 
+				multiplier for normal cdf approximator
+		*/
+		
 		return 1 / (1 + 0.5*abs($x));
 	}
 	
 	function tau($x) {
+		
+		/*
+			numeric approximation for error function (for use calculating normal cdf)
+			parameters:
+				x: z-score
+				
+			returns:
+				raw error function (this is an odd function so it is passed to erf(), which accounts for +/- values)
+		*/
 		
 		$t = t($x);
 		$a1 = -1.26551223;
@@ -70,22 +102,55 @@
 	}
 	
 	function phi($x) {
+		
+		/*
+			phi(x) = e^(-x^2/2 - dt)
+			current implementation ignores dividends so dxt is 0
+			
+			parameters:
+				x: d1 from black scholes model
+				
+			returns:
+				phi(x)
+		*/
+		
 		return exp(-pow($x,2)/2) / sqrt(2 * pi());
 	}
 
 	function is_negative($x) {
+		/*
+			helper function wrapping negativity test
+			
+			parameters:
+				x: any number
+				
+			returns:
+				true if x < 0, false otherwise
+		*/
 		return $x < 0 ? true : false;
 	}
 
 	function normal_cdf($z) {
-
-		//$r = 0.5 + erf(abs($z) / sqrt(2)) / 2;
-
-		//return is_negative($z) ? 1 - $r : $r;
+		
+		/*
+			
+			numeric approximation of normal cdf
+			
+			parameters: 
+				z: a z-score
+				
+			returns: 
+				approximate normal cdf value for the given z-score
+		*/
+		
 		return (1+erf($z/sqrt(2)))/2;
 	}
 
 	function black_scholes_d1($S,$K,$r,$t,$s) {
+		
+		
+		
+		
 		return (log($S/$K,exp(1)) + ($r + pow($s,2)/2) * $t) / ($s * sqrt($t));
 	}
 
