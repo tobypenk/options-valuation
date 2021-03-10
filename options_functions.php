@@ -1,6 +1,18 @@
 <?php
 
 	function black_scholes($S,$K,$r,$t,$s,$type='both') {
+		/*
+			parameters:
+				S: asset price
+				K: option exercise / strike price
+				r: prevailing interest rate
+				t: years to expiration (days to expiration / 365 in the API)
+				s: volatility of the underlying asset
+				type: ['call','put','both'] - what type of valuation to perform
+				
+			returns:
+				black scholes valuation object with option value and first- and some second-order greeks
+		*/
 
 		if ($type == 'call') {
 			return ['call' => black_scholes_call($S,$K,$r,$t,$s)];
