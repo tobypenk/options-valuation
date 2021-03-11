@@ -7,13 +7,13 @@
 			parameters:
 				S: asset price
 				K: option exercise / strike price
-				r: prevailing interest rate
+				r: prevailing risk-free interest rate
 				t: years to expiration (days to expiration / 365 in the API)
 				s: volatility of the underlying asset
 				type: ['call','put','both'] - what type of valuation to perform
 				
 			returns:
-				black scholes valuation object with option value and first- and some second-order greeks
+				option value and first- and some second-order greeks (black scholes valuation object)
 		*/
 
 		if ($type == 'call') {
@@ -39,7 +39,7 @@
 				x: z-score
 				
 			returns: 
-				approximate error function output value for x
+				approximate error function output value for x (float)
 		*/
 		
 		if (is_negative($x)) {
@@ -57,7 +57,7 @@
 				x: z-score
 				
 			returns: 
-				multiplier for normal cdf approximator
+				multiplier for normal cdf approximator (float)
 		*/
 		
 		return 1 / (1 + 0.5*abs($x));
@@ -71,7 +71,7 @@
 				x: z-score
 				
 			returns:
-				raw error function (this is an odd function so it is passed to erf(), which accounts for +/- values)
+				raw error function (this is an odd function so it is passed to erf()) (float)
 		*/
 		
 		$t = t($x);
@@ -111,7 +111,7 @@
 				x: d1 from black scholes model
 				
 			returns:
-				phi(x)
+				phi(x) (float)
 		*/
 		
 		return exp(-pow($x,2)/2) / sqrt(2 * pi());
@@ -125,7 +125,7 @@
 				x: any number
 				
 			returns:
-				true if x < 0, false otherwise
+				true if x < 0, false otherwise (bool)
 		*/
 		return $x < 0 ? true : false;
 	}
@@ -140,7 +140,7 @@
 				z: a z-score
 				
 			returns: 
-				approximate normal cdf value for the given z-score
+				approximate normal cdf value for the given z-score (float)
 		*/
 		
 		return (1+erf($z/sqrt(2)))/2;
@@ -148,17 +148,45 @@
 
 	function black_scholes_d1($S,$K,$r,$t,$s) {
 		
-		
-		
+		/*
+			calculate black scholes d1, the z-score for the stock's future value iff S > K at expiration
+				normal_cdf(d1) gives the stock's future value iff S > K at expiration
+			
+			parameters:
+				S: current asset price
+				K: option strike / exercise price
+				r: prevailing risk-free interest rate
+				t: years to expiration (days / 365)
+				s: volatility of the underlying asset
+				
+			returns:
+				d1 (float)
+		*/
 		
 		return (log($S/$K,exp(1)) + ($r + pow($s,2)/2) * $t) / ($s * sqrt($t));
 	}
 
 	function black_scholes_d2($s,$t,$d1) {
+		
+		/*
+			calculate black scholes d2, the z-score of the probability the option will be exercised
+				normal_cdf(d2) gives the probability of exercise
+				
+			parameters:
+				s: volatility of the underlying asset
+				t: years to expiration (days / 365)
+				d1: z-score for future value if S > K at expiration
+				
+			returns:
+				d2 (float)
+		*/
+		
 		return $d1 - $s*sqrt($t);
 	}
 
 	function black_scholes_call($S,$K,$r,$t,$s) {
+		
+		
 
 		$d1 = black_scholes_d1($S,$K,$r,$t,$s);
 		$n1 = normal_cdf($d1);
