@@ -72,6 +72,9 @@
 				
 			returns:
 				raw error function (this is an odd function so it is passed to erf()) (float)
+				
+			based on Numerical Recipes in Fortran 77: The Art of Scientific Computing 
+				(ISBN 0-521-43064-X), 1992, page 214, Cambridge University Press.
 		*/
 		
 		$t = t($x);
@@ -105,7 +108,7 @@
 		
 		/*
 			phi(x) = e^(-x^2/2 - dt)
-			current implementation ignores dividends so dxt is 0
+			current implementation ignores dividends so dt is 0
 			
 			parameters:
 				x: d1 from black scholes model
@@ -133,7 +136,6 @@
 	function normal_cdf($z) {
 		
 		/*
-			
 			numeric approximation of normal cdf
 			
 			parameters: 
@@ -230,7 +232,6 @@
 			
 			returns:
 				option value and first- and some second-order greeks (black scholes put object)
-			
 		*/
 
 		$d1 = black_scholes_d1($S,$K,$r,$t,$s);
@@ -264,8 +265,7 @@
 				type: ['call','put','both'] - what type of valuation to perform
 			
 			returns:
-				option value and first- and some second-order greeks (black scholes call object)
-			
+				option value (float)
 		*/
 
 		$d1 = black_scholes_d1($S,$K,$r,$t,$s);
@@ -341,6 +341,7 @@
 	
 	function option_color() {
 		// not yet implemented
+		// color is third-order derivative w.r.t. underlying asset price
 	}
 
 	function option_theta($S,$K,$r,$t,$s,$type='call') {
@@ -352,7 +353,7 @@
 				S: asset price
 				K: option exercise / strike price
 				r: prevailing risk-free interest rate
-				t: years to expiration (days to expiration / 365 in the API)
+				t: years to expiration (days to expiration / 365)
 				s: volatility of the underlying asset
 				type: ['call','put','both'] - what type of valuation to perform
 			
@@ -381,7 +382,7 @@
 		// identical for calls and puts but handles $type anyway for conceptual consistency among functions
 		
 		/*
-			calculates vega, the change in option value with respect to a 1% change in implied volatility
+			calculates vega, the change in option value with respect to a 1ppt change in implied volatility
 			
 			parameters:
 				S: asset price
@@ -392,7 +393,7 @@
 				type: ['call','put','both'] - what type of valuation to perform
 			
 			returns:
-				vega (float) representing the $ change in option price for a 1% change in implied volatility
+				vega (float) representing the $ change in option price for a 1ppt change in implied volatility
 		*/
 
 		$d1 = black_scholes_d1($S,$K,$r,$t,$s);
@@ -402,7 +403,7 @@
 	function option_rho($S,$K,$r,$t,$s,$type='call') {
 		
 		/*
-			calculates rho, the change in option value with respect to a 1% change in risk-free interest rate
+			calculates rho, the change in option value with respect to a 1ppt change in risk-free interest rate
 			
 			parameters:
 				S: asset price
@@ -413,7 +414,7 @@
 				type: ['call','put','both'] - what type of valuation to perform
 			
 			returns:
-				rho (float) representing the $ change in option price for a 1% change in risk-free interest rate
+				rho (float) representing the $ change in option price for a 1ppt change in risk-free interest rate
 		*/
 
 		$d1 = black_scholes_d1($S,$K,$r,$t,$s);
@@ -448,7 +449,7 @@
 			
 			returns:
 				sensitivities (array of floats, length increments_plus_minus * 2 + 1) representing value of option at
-					each possible underlying asset price
+					each simulated underlying asset price, keeping all other variables constant
 		*/
 		
 		$total = [];
@@ -486,6 +487,25 @@
 
 	function sensitivity_V_wrt_vol($S,$K,$r,$t,$s,$type='call',$increment=0.01,$increments_plus_minus=40) {
 
+		/*
+			numeric approximation of option value with respect to underlying asset volatility - assumes all inputs besides
+				underlying asset volatility are held constant
+			
+			parameters:
+				S: current asset price
+				K: option exercise / strike price
+				r: prevailing risk-free interest rate
+				t: years to expiration (days to expiration / 365 in the API)
+				s: volatility of the underlying asset
+				type: ['call','put','both'] - what type of valuation to perform
+				increment: the spacing of tested points
+				increments_plus_minus: how many points (spaced $increment apart) to test above and below current price
+			
+			returns:
+				sensitivities (array of floats, length increments_plus_minus * 2 + 1) representing value of option at
+					each simulated underlying asset volatility, keeping all other variables constant
+		*/
+
 		$total = [];
 
 		if ($type == 'call') {
@@ -521,6 +541,25 @@
 	}
 
 	function sensitivity_V_wrt_t($S,$K,$r,$t,$s,$type='call') {
+
+		/*
+			numeric approximation of option value with respect to passage of time - assumes all inputs besides
+				time are held constant
+			
+			parameters:
+				S: current asset price
+				K: option exercise / strike price
+				r: prevailing risk-free interest rate
+				t: years to expiration (days to expiration / 365 in the API)
+				s: volatility of the underlying asset
+				type: ['call','put','both'] - what type of valuation to perform
+				increment: the spacing of tested points
+				increments_plus_minus: how many points (spaced $increment apart) to test above and below current price
+			
+			returns:
+				sensitivities (array of floats, length increments_plus_minus * 2 + 1) representing value of option at
+					each time, keeping all other variables constant
+		*/
 
 		global $days_in_year;
 		$t_days = round($t * $days_in_year);
@@ -565,12 +604,31 @@
 	}
 
 	
+	
 	function implied_volatility(
 		$S,$K,$V,$r,$t,
 		$type='both',
 		$s=1.0,
 		$precision=1e-4,$increment=0.1,$max_iterations=1e4
 	) {
+		
+		/*
+			iterative method for finding implied volatility
+			
+			parameters:
+				S: current asset price
+				K: option exercise / strike price
+				r: prevailing risk-free interest rate
+				t: years to expiration (days to expiration / 365 in the API)
+				type: ['call','put','both'] - what type of valuation to perform
+				s: initial guess for volatility of the underlying asset
+				precision: the threshold of accuracy below which the function will return instead of iterating
+				increment: how much to increment s on each iteration (weighted by magnitude of inaccuracy)
+				max_iterations: how many iterations to try before returning even if precision is not reached
+			
+			returns:
+				implied volatility (float)
+		*/
 
 		if ($type == 'call') {
 			return ['call' => implied_volatility_calc($S,$K,$V,$r,$t,'call',$s,$precision,$increment,$max_iterations)];
