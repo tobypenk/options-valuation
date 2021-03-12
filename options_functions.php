@@ -613,7 +613,7 @@
 	) {
 		
 		/*
-			iterative method for finding implied volatility
+			wrapper for implied volatility function
 			
 			parameters:
 				S: current asset price
@@ -627,7 +627,11 @@
 				max_iterations: how many iterations to try before returning even if precision is not reached
 			
 			returns:
-				implied volatility (float)
+				array of key-value pairs:
+					string ["call", "put"] => [
+						s => implied volatility (float), 
+						iterations => number of iterations to completion (int)
+					]
 		*/
 
 		if ($type == 'call') {
@@ -654,6 +658,28 @@
 		$precision,$increment,$max_iterations,
 		$iterations=0
 	) {
+		
+		/*
+			
+			iterative method for finding implied volatility
+			
+			parameters:
+				S: current asset price
+				K: option exercise / strike price
+				r: prevailing risk-free interest rate
+				t: years to expiration (days to expiration / 365 in the API)
+				type: ['call','put','both'] - what type of valuation to perform
+				s: initial guess for volatility of the underlying asset
+				precision: the threshold of accuracy below which the function will return instead of iterating
+				increment: how much to increment s on each iteration (weighted by magnitude of inaccuracy)
+				max_iterations: how many iterations to try before returning even if precision is not reached
+			
+			returns:
+				implied volatility object (s => implied volatility (float), iterations => iterations to completion (int)
+				
+				recurs if precision not reached and iteration ceiling not reached
+			
+		*/
 		
 		$v = option_value($S,$K,$r,$t,$s,$type);
 		
