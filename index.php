@@ -195,6 +195,13 @@
 	})
 	
 	function valuation_submit() {
+		
+		/*
+			
+			
+			
+		*/
+		
 		var S = $(".valuation-input.S").val().trim(),
 			K = $(".valuation-input.K").val().trim(),
 			r = $(".valuation-input.r").val().trim(),

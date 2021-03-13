@@ -1,4 +1,16 @@
 function contains(arr,el) {
+	
+	/*
+		
+		detects whether el is in arr
+		
+		parameters:
+			arr (array): the haystack
+			el (flexible type): the needle
+			
+		returns:
+			bool: el in arr ? true : false
+	*/
 
 	for (var i=0; i<arr.length; i++) {
 		if (arr[i] == el) return true;
@@ -7,6 +19,18 @@ function contains(arr,el) {
 }
 
 function parse_get_parameters() {
+	
+	/*
+		
+		parses the search field of the window's url
+		
+		parameters:
+			none (consumes window global variable)
+			
+		returns:
+			array of arrays, with arr[i][0] = key and arr[i][1] = value
+		
+	*/
 
 	var params = params = window.location.search
 			.slice(1)
@@ -22,6 +46,19 @@ function parse_get_parameters() {
 }
 
 function dedupe_parameters(params) {
+	
+	/*
+		
+		handles the case where a certain key is present more than once in the window search string
+			retains only the last instance
+			
+		parameters:
+			params (array of arrays) representing the parsed window search field
+			
+		returns:
+			array of arrays de-duped on arr[i][0] (the key)
+		
+	*/
 		
 	var p = [], n = [], i
 
@@ -40,3 +77,5 @@ function stringify_parameter_array(params) {
 	return params.map(function(x){return x.join("=")})
 		.join("&");
 }
+
+
