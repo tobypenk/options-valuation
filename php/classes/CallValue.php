@@ -81,7 +81,7 @@
 			return $v;
 		}
 		
-		public function option_delta(): float {
+		public function delta(): float {
 		
 			/*
 				calculates delta, the change in option value with respect to an increase of $1 in the underlying asset price
@@ -99,13 +99,32 @@
 			return $n1;
 		}
 		
+		function gamma() {
+		
+			// identical for calls and puts but handles $type anyway for conceptual consistency among functions
+			
+			/*
+				calculates gamma, the change in option delta with respect to an increase of $1 in the underlying asset price
+					this is a measure of convexity, the second-order derivative of option value w.r.t. asset value
+					
+				parameters:
+					none (uses instance parameters)
+				
+				returns:
+					gamma (float) representing the change in option delta for a $1 increase in underlying asset value
+			*/
+			
+			return phi($this->d1())/($this->S*$this->s*sqrt($this->t));
+		}
+	
+		
 		
 		
 		
 		
 		
 		public function echotest(): void {
-			echo $this->option_delta();
+			echo $this->gamma();
 		}
 		
 	}
