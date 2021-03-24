@@ -6,6 +6,8 @@
 	
 	include_once("../libraries/math.php");
 	
+	//note - should add caching to improve compute speed, particularly for sensitivities
+	
 	class CallValue {
 		
 		public float $S;
@@ -99,7 +101,7 @@
 			return $n1;
 		}
 		
-		function gamma() {
+		public function gamma(): float {
 		
 			// identical for calls and puts but handles $type anyway for conceptual consistency among functions
 			
@@ -118,13 +120,32 @@
 		}
 	
 		
+		public function theta(): float {
 		
+			/*
+				calculates theta (time decay), the change in option value with respect to the passage of 1 day
+				
+				parameters:
+					none (uses instance parameters)
+				
+				returns:
+					theta (float) representing the $ change in option price for a 1-day passage of time
+			*/
+	
+			$d1 = $this->d1();
+			$d2 = $this->d2();
+	
+			$v0 = -$this->S * phi($d1) * $this->s / (2 * sqrt($this->t));
+			$v1 = -$this->r * $this->K * exp(-$this->r * $this->t) * normal_cdf($d2);
+
+			return ($v0 + $v1) / 365;
+		}
 		
 		
 		
 		
 		public function echotest(): void {
-			echo $this->gamma();
+			echo $this->theta();
 		}
 		
 	}
