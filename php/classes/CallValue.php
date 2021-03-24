@@ -141,11 +141,43 @@
 			return ($v0 + $v1) / 365;
 		}
 		
+		public function vega(): float {
 		
+			/*
+				calculates vega, the change in option value with respect to a 1ppt change in implied volatility
+				
+				parameters:
+					none (uses instance parameters)
+				
+				returns:
+					vega (float) representing the $ change in option price for a 1ppt change in implied volatility
+			*/
+	
+			$d1 = $this->d1();
+			return $this->S * phi($d1) * sqrt($this->t) / 100;
+		}
+		
+		public function rho(): float {
+			
+			/*
+				calculates rho, the change in option value with respect to a 1ppt change in risk-free interest rate
+				
+				parameters:
+					none (uses instance parameters)
+				
+				returns:
+					rho (float) representing the $ change in option price for a 1ppt change in risk-free interest rate
+			*/
+	
+			$d2 = $this->d2();
+
+			return  $this->K * $this->t * exp(-$this->r * $this->t) * normal_cdf($d2) / 100;
+			
+		}
 		
 		
 		public function echotest(): void {
-			echo $this->theta();
+			echo $this->rho();
 		}
 		
 	}
