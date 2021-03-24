@@ -81,9 +81,33 @@
 			return $v;
 		}
 		
-		public function echotest(): void {
-			echo $this->valuation();
+		public function option_delta(): float {
+		
+			/*
+				calculates delta, the change in option value with respect to an increase of $1 in the underlying asset price
+				
+				parameters:
+					none (uses instance parameters)
+				
+				returns:
+					delta (float) representing the $ change in option price for a $1 increase in underlying asset value
+			*/
+	
+			$d1 = $this->d1();
+			$n1 = normal_cdf($d1);
+
+			return $n1;
 		}
+		
+		
+		
+		
+		
+		
+		public function echotest(): void {
+			echo $this->option_delta();
+		}
+		
 	}
 	
 	
