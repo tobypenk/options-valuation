@@ -162,7 +162,7 @@
 		
 		
 		
-		public function sensitivity_V_wrt_S(float $increment=0.1,int $increments_plus_minus=40): array {
+		public function sensitivity_V_wrt_S(float $increment=0.1, int $increments_plus_minus=40): array {
 		
 			/*
 				numeric approximation of option value with respect to underlying asset price - assumes all inputs besides
@@ -185,6 +185,29 @@
 			return $total;
 		}
 
+
+		public function sensitivity_V_wrt_vol(float $increment=0.01, int $increments_plus_minus=40): array {
+
+			/*
+				numeric approximation of option value with respect to underlying asset volatility - assumes all inputs besides
+					underlying asset volatility are held constant
+				
+				returns:
+					sensitivities (array of floats, length increments_plus_minus * 2 + 1) representing value of option at
+						each simulated underlying asset volatility, keeping all other variables constant
+			*/
+	
+			$total = [];
+	
+			for ($i=$increments_plus_minus*-1; $i<$increments_plus_minus; $i++) {
+				$instance_s = $this->s + $increment * $i;
+				$v = $this->valuation($instance_s = $instance_s);
+				array_push($total,['vol'=>$instance_s,'V'=>$v]);
+			}
+	
+			return $total;
+		}
+
 		
 		
 		
@@ -193,7 +216,7 @@
 		
 		
 		public function echotest(): void {
-			echo json_encode($this->sensitivity_V_wrt_S());
+			echo json_encode($this->sensitivity_V_wrt_vol());
 		}
 		
 	}
