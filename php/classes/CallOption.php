@@ -221,8 +221,8 @@
 	
 			$total = [];
 	
-			while ($t_days > 1) {
-				$instance_t = ($t_days - 1) / 365;
+			while ($t_days > 0) {
+				$instance_t = ($t_days) / 365;
 				$v = $this->valuation($this->S,$this->s,$instance_t);
 				array_push($total,['t'=>round($instance_t*365),'V'=>$v]);
 				$t_days -= 1;
@@ -231,19 +231,50 @@
 			return $total;
 		}
 
-		
+		public function implied_volatility($s=1.0,$precision=1e-5,$increment=1e-1,$max_iterations=1e4,$iterations=0) {
+			
+			/*
+				
+				iterative method for finding implied volatility
+				
+				parameters:
+					s: initial guess for volatility of the underlying asset
+					precision: the threshold of accuracy below which the function will return instead of iterating
+					increment: how much to increment s on each iteration (weighted by magnitude of inaccuracy)
+					max_iterations: how many iterations to try before returning even if precision is not reached
+				
+				returns:
+					implied volatility object (s => implied volatility (float), iterations => iterations to completion (int)
+					
+					recurs if precision not reached and iteration ceiling not reached
+				
+			*/
+						
+			$v = $this->valuation(null,$s,null);
+			
+			if ((abs($this->V-$v) <= $precision) || $iterations == $max_iterations) {
+				return [
+					's' => $s,
+					'iterations' => $iterations
+				];
+			} else {
+				$s = $s + $increment * ($this->V/$v - 1);
+				return $this->implied_volatility($s,$precision,$increment,$max_iterations,$iterations+1);
+			}
+		}
 		
 		
 		
 		
 		public function echotest(): void {
-			echo json_encode($this->sensitivity_V_wrt_t());
+			echo 0.52918078313221;
+			echo json_encode($this->implied_volatility());
 		}
 		
 	}
 	
 	
-	$x = new CallOption(10.0,10.0,0.01,10./365,0.8,null);
+	$x = new CallOption(10.0,10.0,0.01,10./365,null,0.52918078313221);
 	$x->echotest();
 	
 ?>
