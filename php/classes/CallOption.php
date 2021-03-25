@@ -39,60 +39,57 @@
 		    }
 	    }
 	    
-	    private function d1(float $S_override = null, float $s_override = null): float {
+	    private function d1(float $S = null, float $s = null, float $t = null): float {
 		
 			/*
 				returns black scholes d1, the z-score for the stock's future value iff S > K at expiration
 					normal_cdf(d1) gives the stock's future value iff S > K at expiration
 			*/
 			
-			if (is_null($s_override)) {
-				$instance_s = $this->s;
-			} else {
-				$instance_s = $s_override;
-			}
-			
-			if (is_null($S_override)) {
-				$instance_S = $this->S;
-			} else {
-				$instance_S = $S_override;
-			}
+			if (is_null($S)) $S = $this->S;
+			if (is_null($s)) $s = $this->s;
+			if (is_null($t)) $t = $this->t;
 			
 			return (
-				log($instance_S/$this->K,exp(1)) + 
-				($this->r + pow($instance_s,2)/2) * $this->t) / 
-				($instance_s * sqrt($this->t)
+				log($S/$this->K,exp(1)) + 
+				($this->r + pow($s,2)/2) * $t) / 
+				($s * sqrt($t)
 			);
 	    }
 	    
-	    private function d2(float $S_override = null, float $s_override = null): float {
+	    private function d2(float $S = null, float $s = null, float $t = null): float {
 			
 			/*
 				returns black scholes d2, the z-score of the probability the option will be exercised
 					normal_cdf(d2) gives the probability of exercise
 			*/
 			
-			if (is_null($s_override)) {
-				$instance_s = $this->s;
-			} else {
-				$instance_s = $s_override;
-			}
+			if (is_null($S)) $S = $this->S;
+			if (is_null($s)) $s = $this->s;
+			if (is_null($t)) $t = $this->t;
 			
-			return $this->d1($S_override, $s_override) - $instance_s * sqrt($this->t);
+			return $this->d1($S,$s,$t) - 
+				$s * sqrt($t);
 		}
 		
-		public function valuation(float $S_override = null, float $s_override = null): float {
+		
+		public function valuation(float $S = null, float $s = null, float $t = null): float {
 		
 			/*
 				returns option value
 			*/
 			
-			$d1 = $this->d1($s_override);
-			$d2 = $this->d2($s_override);
+			if (is_null($S)) $S = $this->S;
+			if (is_null($s)) $s = $this->s;
+			if (is_null($t)) $t = $this->t;
+			
+			$d1 = $this->d1($S,$s,$t);
+			$d2 = $this->d2($S,$s,$t);
 	
 			$n1 = normal_cdf($d1);
 			$n2 = normal_cdf($d2);
-			$v = $this->S * $n1 - $this->K * exp(-$this->r * $this->t) * $n2;
+			
+			$v = $S * $n1 - $this->K * exp(-$this->r * $t) * $n2;
 			
 			return $v;
 		}
@@ -178,7 +175,7 @@
 			for ($i=$increments_plus_minus*-1; $i<$increments_plus_minus; $i++) {
 				
 				$instance_S = $this->S + $increment * $i;
-				$v = (new CallOption($instance_S,$this->K,$this->r,$this->t,$this->s))->valuation();
+				$v = $this->valuation($instance_S,$this->s,$this-t);
 				array_push($total,["S"=>$instance_S,"V"=>$v]);
 			}
 						
@@ -201,10 +198,36 @@
 	
 			for ($i=$increments_plus_minus*-1; $i<$increments_plus_minus; $i++) {
 				$instance_s = $this->s + $increment * $i;
-				$v = $this->valuation($instance_s = $instance_s);
+				$v = $this->valuation($this->S,$instance_s,$this->t);
 				array_push($total,['vol'=>$instance_s,'V'=>$v]);
 			}
 	
+			return $total;
+		}
+
+		
+		public function sensitivity_V_wrt_t() {
+
+			/*
+				numeric approximation of option value with respect to passage of time - assumes all inputs besides
+					time are held constant
+				
+				returns:
+					sensitivities (array of floats, length increments_plus_minus * 2 + 1) representing value of option at
+						each time, keeping all other variables constant
+			*/
+	
+			$t_days = round($this->t * 365);
+	
+			$total = [];
+	
+			while ($t_days > 1) {
+				$instance_t = ($t_days - 1) / 365;
+				$v = $this->valuation($this->S,$this->s,$instance_t);
+				array_push($total,['t'=>round($instance_t*365),'V'=>$v]);
+				$t_days -= 1;
+			}
+
 			return $total;
 		}
 
@@ -213,10 +236,8 @@
 		
 		
 		
-		
-		
 		public function echotest(): void {
-			echo json_encode($this->sensitivity_V_wrt_vol());
+			echo json_encode($this->sensitivity_V_wrt_t());
 		}
 		
 	}
