@@ -31,6 +31,40 @@
 		    }
 	    }
 	    
+	    protected function d1(float $S = null, float $s = null, float $t = null): float {
+		
+			/*
+				returns black scholes d1, the z-score for the stock's future value iff S > K at expiration
+					normal_cdf(d1) gives the stock's future value iff S > K at expiration
+			*/
+			
+			if (is_null($S)) $S = $this->S;
+			if (is_null($s)) $s = $this->s;
+			if (is_null($t)) $t = $this->t;
+			
+			return (
+				log($S/$this->K,exp(1)) + 
+				($this->r + pow($s,2)/2) * $t) / 
+				($s * sqrt($t)
+			);
+	    }
+	    
+	    protected function d2(float $S = null, float $s = null, float $t = null): float {
+			
+			/*
+				returns black scholes d2, the z-score of the probability the option will be exercised
+					normal_cdf(d2) gives the probability of exercise
+			*/
+			
+			if (is_null($S)) $S = $this->S;
+			if (is_null($s)) $s = $this->s;
+			if (is_null($t)) $t = $this->t;
+			
+			return $this->d1($S,$s,$t) - 
+				$s * sqrt($t);
+		}
+		
+	    
 	    public function gamma(): float {
 					
 			/*

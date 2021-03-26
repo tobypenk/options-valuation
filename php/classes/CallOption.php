@@ -10,41 +10,29 @@
 	//note - should add caching to improve compute speed, particularly for sensitivities
 	
 	class Call extends Option {
-	    
-	    private function d1(float $S = null, float $s = null, float $t = null): float {
 		
-			/*
-				returns black scholes d1, the z-score for the stock's future value iff S > K at expiration
-					normal_cdf(d1) gives the stock's future value iff S > K at expiration
-			*/
+		public function summary($sensitivities = false) {
+			$total = [
+				"value" => $this->value(),
+				"delta" => $this->delta(),
+				"gamma" => $this->gamma(),
+				"theta" => $this->theta(),
+				"rho" => $this->rho(),
+				"vega" => $this->vega()
+			];
 			
-			if (is_null($S)) $S = $this->S;
-			if (is_null($s)) $s = $this->s;
-			if (is_null($t)) $t = $this->t;
+			if ($sensitivities) {
+				$total["sensitivities"] = [
+					"V_as_a_function_of_S" => $this->sensitivity_V_wrt_S(),
+					"V_as_a_function_of_s" => $this->sensitivity_V_wrt_vol(),
+					"V_as_a_function_of_t" => $this->sensitivity_V_wrt_t()
+				];
+			}
 			
-			return (
-				log($S/$this->K,exp(1)) + 
-				($this->r + pow($s,2)/2) * $t) / 
-				($s * sqrt($t)
-			);
-	    }
-	    
-	    private function d2(float $S = null, float $s = null, float $t = null): float {
-			
-			/*
-				returns black scholes d2, the z-score of the probability the option will be exercised
-					normal_cdf(d2) gives the probability of exercise
-			*/
-			
-			if (is_null($S)) $S = $this->S;
-			if (is_null($s)) $s = $this->s;
-			if (is_null($t)) $t = $this->t;
-			
-			return $this->d1($S,$s,$t) - 
-				$s * sqrt($t);
+			return $total;
 		}
-		
-		
+	    
+	    
 		public function value(float $S = null, float $s = null, float $t = null): float {
 		
 			/*
@@ -105,11 +93,6 @@
 			
 		}
 		
-		
-		
-		
-		
-		
 		public function sensitivity_V_wrt_S(float $increment=0.1, int $increments_plus_minus=40): array {
 		
 			/*
@@ -126,13 +109,12 @@
 			for ($i=$increments_plus_minus*-1; $i<$increments_plus_minus; $i++) {
 				
 				$instance_S = $this->S + $increment * $i;
-				$v = $this->value($instance_S,$this->s,$this-t);
+				$v = $this->value($instance_S,$this->s,$this->t);
 				array_push($total,["S"=>$instance_S,"V"=>$v]);
 			}
 						
 			return $total;
 		}
-
 
 		public function sensitivity_V_wrt_vol(float $increment=0.01, int $increments_plus_minus=40): array {
 
@@ -156,7 +138,6 @@
 			return $total;
 		}
 
-		
 		public function sensitivity_V_wrt_t() {
 
 			/*
@@ -184,18 +165,15 @@
 
 		
 		
-		
-		
-		
 		public function echotest(): void {
 			echo 0.52918078313221;
-			echo json_encode($this->implied_volatility());
+			echo json_encode($this->summary(true));
 		}
 		
 	}
 	
 	
-	$x = new Call(10.0,10.0,0.01,10./365,null,0.52918078313221);
+	$x = new Call(10.0,10.0,0.01,10./365,0.8,null);
 	$x->echotest();
 	
 ?>
