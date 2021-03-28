@@ -118,11 +118,37 @@
 
 			return $total;
 		}
+		
+		public function V_as_a_function_of_t(): array {
+
+			/*
+				numeric approximation of option value with respect to passage of time - assumes all inputs besides
+					time are held constant
+				
+				returns:
+					sensitivities (array of floats, length increments_plus_minus * 2 + 1) representing value of option at
+						each time, keeping all other variables constant
+			*/
+	
+			$t_days = round($this->t * 365);
+	
+			$total = [];
+
+			while ($t_days > 0) {
+				$instance_t = ($t_days) / 365;
+				$v = $this->value($this->S,$this->s,$instance_t);
+				array_push($total,['t'=>round($instance_t*365),'V'=>$v]);
+				$t_days -= 1;
+			}
+	
+			return $total;
+		}
+
 
 		
 	
 		public function echotest(): void {
-			echo json_encode($this->V_as_a_function_of_volatility());
+			echo json_encode($this->V_as_a_function_of_t());
 		}
 		
 	}

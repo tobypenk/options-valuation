@@ -137,7 +137,7 @@
 			return $total;
 		}
 
-		public function V_as_a_function_of_t() {
+		public function V_as_a_function_of_t(): array {
 
 			/*
 				numeric approximation of option value with respect to passage of time - assumes all inputs besides
