@@ -75,6 +75,51 @@
 		}
 
 		
+		
+		function sensitivity_V_wrt_S($increment=0.1,$increments_plus_minus=40) {
+		
+			/*
+				numeric approximation of option value with respect to underlying asset price - assumes all inputs besides
+					underlying asset price are held constant
+				
+				returns:
+					sensitivities (array of floats, length increments_plus_minus * 2 + 1) representing value of option at
+						each simulated underlying asset price, keeping all other variables constant
+			*/
+			
+			$total = [];
+	
+			if ($type == 'call') {
+				$call_total = [];
+				for ($i=$increments_plus_minus*-1; $i<$increments_plus_minus; $i++) {
+					$test_S = $S + $increment * $i;
+					$v = option_value($test_S,$K,$r,$t,$s,'call');
+					array_push($call_total,["S"=>$test_S,"V"=>$v]);
+				}
+	
+				$total["call"] = $call_total;
+	
+			} else if ($type == 'put') {
+				$put_total = [];
+				for ($i=$increments_plus_minus*-1; $i<$increments_plus_minus; $i++) {
+					$test_S = $S + $increment * $i;
+					$v = option_value($test_S,$K,$r,$t,$s,'put');
+					array_push($put_total,['S'=>$test_S,'V'=>$v]);
+				}
+	
+				$total['put'] = $put_total;
+	
+			} else if ($type == 'both') {
+				$total['call'] = sensitivity_V_wrt_S($S,$K,$r,$t,$s,'call',$increment,$increments_plus_minus)['call'];
+				$total['put'] = sensitivity_V_wrt_S($S,$K,$r,$t,$s,'put',$increment,$increments_plus_minus)['put'];
+	
+			} else {
+				trigger_error("sensitivity calculation requires specification of 'call' or 'put' for parameter 'type'.");
+			}
+	
+			return $total;
+		}
+
 	
 		public function echotest(): void {
 			echo json_encode($this->rho());
