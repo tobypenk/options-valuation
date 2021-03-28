@@ -1,5 +1,7 @@
 <?php
 	
+	include_once("../libraries/math.php");
+	
 	class Option {
 		
 		public float $S;

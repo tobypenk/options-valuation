@@ -4,7 +4,7 @@
 	ini_set('display_startup_errors', 1);
 	error_reporting(E_ALL);
 	
-	include_once("../libraries/math.php");
+	
 	include_once("Option.php");
 	
 	//note - should add caching to improve compute speed, particularly for sensitivities
@@ -31,7 +31,6 @@
 			
 			return $total;
 		}
-	    
 	    
 		public function value(float $S = null, float $s = null, float $t = null): float {
 		
@@ -165,15 +164,15 @@
 
 		
 		
+
 		public function echotest(): void {
-			echo 0.52918078313221;
-			echo json_encode($this->summary(true));
+			echo json_encode($this->value());
 		}
 		
 	}
 	
 	
-	$x = new Call(10.0,10.0,0.01,10./365,0.8,null);
+	$x = new Call(10.0,9.0,0.01,10./365,1.8,null);
 	$x->echotest();
 	
 ?>
