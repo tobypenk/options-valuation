@@ -74,7 +74,7 @@
 			return $v/100;
 		}
 
-		function V_as_a_function_of_S($increment=0.1,$increments_plus_minus=40) {
+		public function V_as_a_function_of_S($increment=0.1,$increments_plus_minus=40): array {
 		
 			/*
 				numeric approximation of option value with respect to underlying asset price - assumes all inputs besides
@@ -96,9 +96,33 @@
 			return $total;
 		}
 
+		
+		public function V_as_a_function_of_volatility($increment=0.01,$increments_plus_minus=40): array {
+
+			/*
+				numeric approximation of option value with respect to underlying asset volatility - assumes all inputs besides
+					underlying asset volatility are held constant
+
+				returns:
+					sensitivities (array of floats, length increments_plus_minus * 2 + 1) representing value of option at
+						each simulated underlying asset volatility, keeping all other variables constant
+			*/
+	
+			$total = [];
+
+			for ($i=$increments_plus_minus*-1; $i<$increments_plus_minus; $i++) {
+				$instance_s = $this->s + $increment * $i;
+				$v = $this->value($this->S,$instance_s,$this->t);
+				array_push($total,['vol'=>$instance_s,'V'=>$v]);
+			}
+
+			return $total;
+		}
+
+		
 	
 		public function echotest(): void {
-			echo json_encode($this->V_as_a_function_of_S());
+			echo json_encode($this->V_as_a_function_of_volatility());
 		}
 		
 	}
