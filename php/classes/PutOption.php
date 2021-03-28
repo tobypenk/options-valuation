@@ -57,11 +57,27 @@
 			return ($v0 + $v1) / 365;
 		}
 
+		public function rho(): float {
 		
+			/*
+				calculates rho, the change in option value with respect to a 1ppt change in risk-free interest rate
+				
+				returns:
+					rho (float) representing the $ change in option price for a 1ppt change in risk-free interest rate
+			*/
+	
+			$d1 = $this->d1();
+			$d2 = $this->d2();
+
+			$v = -$this->K * $this->t * exp(-$this->r * $this->t) * normal_cdf(-$d2);
+	
+			return $v/100;
+		}
+
 		
 	
 		public function echotest(): void {
-			echo json_encode($this->theta());
+			echo json_encode($this->rho());
 		}
 		
 	}
