@@ -23,9 +23,9 @@
 			
 			if ($sensitivities) {
 				$total["sensitivities"] = [
-					"V_as_a_function_of_S" => $this->sensitivity_of_V_to_changes_in_S(),
-					"V_as_a_function_of_s" => $this->sensitivity_of_V_to_changes_in_volatility(),
-					"V_as_a_function_of_t" => $this->sensitivity_of_V_to_changes_in_t()
+					"V_as_a_function_of_S" => $this->V_as_a_function_of_S(),
+					"V_as_a_function_of_volatility" => $this->V_as_a_function_of_volatility(),
+					"V_as_a_function_of_t" => $this->V_as_a_function_of_t()
 				];
 			}
 			
@@ -92,7 +92,7 @@
 			
 		}
 		
-		public function sensitivity_of_V_to_changes_in_S(float $increment=0.1, int $increments_plus_minus=40): array {
+		public function V_as_a_function_of_S(float $increment=0.1, int $increments_plus_minus=40): array {
 		
 			/*
 				numeric approximation of option value with respect to underlying asset price - assumes all inputs besides
@@ -115,7 +115,7 @@
 			return $total;
 		}
 
-		public function sensitivity_of_V_to_changes_in_volatility(float $increment=0.01, int $increments_plus_minus=40): array {
+		public function V_as_a_function_of_volatility(float $increment=0.01, int $increments_plus_minus=40): array {
 
 			/*
 				numeric approximation of option value with respect to underlying asset volatility - assumes all inputs besides
@@ -137,7 +137,7 @@
 			return $total;
 		}
 
-		public function sensitivity_of_V_to_changes_in_t() {
+		public function V_as_a_function_of_t() {
 
 			/*
 				numeric approximation of option value with respect to passage of time - assumes all inputs besides
@@ -166,7 +166,7 @@
 		
 
 		public function echotest(): void {
-			echo json_encode($this->value());
+			echo json_encode($this->summary(true));
 		}
 		
 	}
