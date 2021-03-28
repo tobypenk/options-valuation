@@ -33,6 +33,27 @@
 		    }
 	    }
 	    
+	    public function summary($sensitivities = false) {
+			$total = [
+				"value" => $this->value(),
+				"delta" => $this->delta(),
+				"gamma" => $this->gamma(),
+				"theta" => $this->theta(),
+				"rho" => $this->rho(),
+				"vega" => $this->vega()
+			];
+			
+			if ($sensitivities) {
+				$total["sensitivities"] = [
+					"V_as_a_function_of_S" => $this->V_as_a_function_of_S(),
+					"V_as_a_function_of_volatility" => $this->V_as_a_function_of_volatility(),
+					"V_as_a_function_of_t" => $this->V_as_a_function_of_t()
+				];
+			}
+			
+			return $total;
+		}
+	    
 	    protected function d1(float $S = null, float $s = null, float $t = null): float {
 		
 			/*
@@ -87,7 +108,7 @@
 			return $this->S * phi($d1) * sqrt($this->t) / 100;
 		}
 	    
-	    public function implied_volatility($s=1.0,$precision=1e-5,$increment=1e-1,$max_iterations=1e4,$iterations=0) {
+		public function implied_volatility($s=1.0,$precision=1e-5,$increment=1e-1,$max_iterations=1e4,$iterations=0) {
 			
 			/*
 				
@@ -106,7 +127,7 @@
 				
 			*/
 						
-			$v = $this->valuation(null,$s,null);
+			$v = $this->value(null,$s,null);
 			
 			if ((abs($this->V-$v) <= $precision) || $iterations == $max_iterations) {
 				return [

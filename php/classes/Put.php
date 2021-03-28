@@ -143,18 +143,13 @@
 	
 			return $total;
 		}
-
-
-		
-	
-		public function echotest(): void {
-			echo json_encode($this->V_as_a_function_of_t());
-		}
-		
 	}
 	
 	
-	$x = new Put(10.0,9.0,0.01,10./365,1.8,null);
-	$x->echotest();
+	$x = new Put(10.0,9.0,0.01,10./365,1.8);
+	echo json_encode($x->summary(true));
+
+
+
 	
 ?>

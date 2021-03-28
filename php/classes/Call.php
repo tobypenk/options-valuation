@@ -161,20 +161,9 @@
 
 			return $total;
 		}
-
-		
-		
-
-		public function echotest(): void {
-			echo json_encode($this->summary(true));
-		}
-		
 	}
 	
-	
-	$x = new Call(10.0,9.0,0.01,10./365,1.8,null);
-	$x->echotest();
-	
+
 ?>
 
 
