@@ -79,7 +79,7 @@
 			
 			return (
 				log($S/$this->K,exp(1)) + 
-				($this->r + pow($s,2)/2) * $t) / 
+				($this->r - $this->q + pow($s,2)/2) * $t) / 
 				($s * sqrt($t)
 			);
 	    }
