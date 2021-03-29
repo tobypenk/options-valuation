@@ -1,5 +1,10 @@
 <?php
 	
+	ini_set('display_errors', 1);
+	ini_set('display_startup_errors', 1);
+	error_reporting(E_ALL);
+	
+	
 	include_once("../libraries/math.php");
 	
 	class Option {
@@ -10,8 +15,9 @@
 		public float $t;
 		public ?float $s;
 		public ?float $V;
+		public ?float $q;
 	
-	    public function __construct(float $S, float $K, float $r, float $t, ?float $s = null, ?float $V = null) {
+	    public function __construct(float $S, float $K, float $r, float $t, ?float $s = null, ?float $V = null, ?float $q = 0.0) {
 		    
 		    if (is_null($s) & is_null($V)) {
 			    trigger_error(
@@ -30,6 +36,7 @@
 		        $this->t = $t;
 		        $this->s = $s;
 		        $this->V = $V;
+		        $this->q = $q;
 		    }
 	    }
 	    
@@ -148,7 +155,29 @@
 				return $this->implied_volatility($s,$precision,$increment,$max_iterations,$iterations+1);
 			}
 		}
-	}
 	
+	
+		/*
+			
+			to implement:
+			
+			second-order greeks:
+				vanna - derivative of delta wrt volatility
+				charm - derivative of delta wrt time
+				vomma - second derivative of value wrt volatility
+				veta - derivative of vega wrt time
+				vera - derivative of who wrt volatility
+			
+			third-order greeks:
+				speed: third derivative of value wrt spot price
+				zomma: derivative of gamma wrt volatility
+				color: derivative of gamma wrt time
+				ultima: third derivative of value wrt volatility
+				
+			formulae are on https://en.wikipedia.org/wiki/Greeks_(finance)#Second-order_Greeks
+			
+		*/
+	
+	}
 	
 ?>

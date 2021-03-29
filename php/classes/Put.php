@@ -28,7 +28,7 @@
 
 			$n1p = normal_cdf(-$d1);
 			$n2p = normal_cdf(-$d2);
-			return $this->K * exp(-$this->r * $t) * $n2p - $S * $n1p;
+			return $this->K * exp(-$this->r * $t) * $n2p - $S * exp(-$this->q * $t) * $n1p;
 	
 		}
 		
@@ -148,12 +148,5 @@
 			return $total;
 		}
 	}
-	
-	
-	$x = new Put(10.0,9.0,0.01,10./365,1.8);
-	echo json_encode($x->summary(true));
-
-
-
 	
 ?>

@@ -6,6 +6,7 @@
 	
 	
 	include_once("Option.php");
+	include_once("Put.php");
 	
 	//note - should add caching to improve compute speed, particularly for sensitivities
 	
@@ -53,7 +54,7 @@
 			$n1 = normal_cdf($d1);
 			$n2 = normal_cdf($d2);
 			
-			$v = $S * $n1 - $this->K * exp(-$this->r * $t) * $n2;
+			$v = $S * exp(-$this->q * $t) * $n1 - $this->K * exp(-$this->r * $t) * $n2;
 			
 			return $v;
 		}
@@ -168,13 +169,7 @@
 		}
 	}
 	
+	echo json_encode((new Call(100,100,.05,30.0/365,.25,null,0.01))->summary());
+	echo json_encode((new Put(100,100,.05,30.0/365,.25,null,0.01))->summary());
 
 ?>
-
-
-
-
-
-
-
-
