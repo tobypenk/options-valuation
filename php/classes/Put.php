@@ -12,6 +12,11 @@
 			
 			/*
 				returns option value
+				
+				parameters:
+					S: strike price to use for this valuation (uses instance value if null)
+					s: volatility to use for this valuation (uses instance value if null)
+					t: time to expiration to use for this valuation (uses instance value if null)
 			*/
 	
 			if (is_null($S)) $S = $this->S;
@@ -96,7 +101,6 @@
 			return $total;
 		}
 
-		
 		public function V_as_a_function_of_volatility($increment=0.01,$increments_plus_minus=40): array {
 
 			/*

@@ -59,6 +59,11 @@
 			/*
 				returns black scholes d1, the z-score for the stock's future value iff S > K at expiration
 					normal_cdf(d1) gives the stock's future value iff S > K at expiration
+					
+				parameters:
+					S: strike price to use for this valuation (uses instance value if null)
+					s: volatility to use for this valuation (uses instance value if null)
+					t: time to expiration to use for this valuation (uses instance value if null)
 			*/
 			
 			if (is_null($S)) $S = $this->S;
@@ -77,6 +82,11 @@
 			/*
 				returns black scholes d2, the z-score of the probability the option will be exercised
 					normal_cdf(d2) gives the probability of exercise
+					
+				parameters:
+					S: strike price to use for this valuation (uses instance value if null)
+					s: volatility to use for this valuation (uses instance value if null)
+					t: time to expiration to use for this valuation (uses instance value if null)
 			*/
 			
 			if (is_null($S)) $S = $this->S;
@@ -87,7 +97,6 @@
 				$s * sqrt($t);
 		}
 		
-	    
 	    public function gamma(): float {
 					
 			/*
