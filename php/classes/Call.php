@@ -68,7 +68,7 @@
 			$d1 = $this->d1();
 			$n1 = normal_cdf($d1);
 
-			return $n1;
+			return exp(-$this->q * $this->t) * $n1;
 		}
 		
 		public function theta(): float {
