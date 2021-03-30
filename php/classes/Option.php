@@ -121,7 +121,7 @@
 			*/
 	
 			$d1 = $this->d1();
-			return $this->S * phi($d1) * sqrt($this->t) / 100;
+			return $this->S * exp(-$this->q * $this->t) * phi($d1) * sqrt($this->t) / 100;
 		}
 	    
 		public function implied_volatility($s=1.0,$precision=1e-5,$increment=1e-1,$max_iterations=1e4,$iterations=0) {

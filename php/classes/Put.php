@@ -28,6 +28,7 @@
 
 			$n1p = normal_cdf(-$d1);
 			$n2p = normal_cdf(-$d2);
+						
 			return $this->K * exp(-$this->r * $t) * $n2p - $S * exp(-$this->q * $t) * $n1p;
 	
 		}
@@ -78,6 +79,8 @@
 	
 			return $v/100;
 		}
+		
+		
 
 		public function V_as_a_function_of_S($increment=0.1,$increments_plus_minus=40): array {
 		
@@ -147,6 +150,39 @@
 	
 			return $total;
 		}
+		
+		
+		
+		/*
+		public function sensitivity(
+			float $independent = $this->S, 
+			float $dependent = $this->value, 
+			float $increment=0.01,
+			int $increments_plus_minus=40
+		): array {
+			
+			$total = [];
+	
+			for ($i=$increments_plus_minus*-1; $i<$increments_plus_minus; $i++) {
+				$instance = $independent + $increment * $i;
+				$v = $dependent($instance,$this->s,$this->t);
+				array_push($total,['S'=>$instance_S,'V'=>$v]);
+			}
+	
+			return $total;
+		}
+		*/
+		
+		
 	}
 	
 ?>
+
+
+
+
+
+
+
+
+
