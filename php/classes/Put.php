@@ -57,10 +57,11 @@
 			$d1 = $this->d1();
 			$d2 = $this->d2();
 	
-			$v0 = -$this->S * phi($d1) * $this->s / (2 * sqrt($this->t));
-			$v1 = $this->r * $this->K * exp(-$this->r * $this->t) * normal_cdf(-$d2);
+			$v0 = -$this->dividend_discount_factor() * $this->S * phi($d1) * $this->s / (2 * sqrt($this->t));
+			$v1 = $this->r * $this->K * $this->risk_free_rate_discount_factor() * normal_cdf(-$d2);
+			$v2 = -$this->q * $this->S * $this->dividend_discount_factor() * normal_cdf(-$d1);
 				
-			return ($v0 + $v1) / 365;
+			return ($v0 + $v1 + $v2) / 365;
 		}
 
 		public function rho(): float {
@@ -79,8 +80,6 @@
 	
 			return $v/100;
 		}
-		
-		
 
 		public function V_as_a_function_of_S($increment=0.1,$increments_plus_minus=40): array {
 		
