@@ -103,6 +103,14 @@
 			return $this->d1($S,$s,$t) - 
 				$s * sqrt($t);
 		}
+	    
+	    protected function dividend_discount_factor(): float {
+			return exp(-$this->q * $this->t);
+		}
+		
+		protected function risk_free_rate_discount_factor(): float {
+			return exp(-$this->r * $this->t);
+		}
 		
 	    public function gamma(): float {
 					
@@ -155,8 +163,9 @@
 				return $this->implied_volatility($s,$precision,$increment,$max_iterations,$iterations+1);
 			}
 		}
-	
-	
+		
+		
+		
 		/*
 			
 			to implement:
