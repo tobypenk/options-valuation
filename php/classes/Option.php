@@ -40,15 +40,38 @@
 		    }
 	    }
 	    
-	    public function summary($sensitivities = false) {
+	    public function summary(
+			$first_order_greeks = true, 
+			$second_order_greeks = false, 
+			$third_order_greeks = false, 
+			$sensitivities = false
+		) {
 			$total = [
-				"value" => $this->value(),
-				"delta" => $this->delta(),
-				"gamma" => $this->gamma(),
-				"theta" => $this->theta(),
-				"rho" => $this->rho(),
-				"vega" => $this->vega()
+				"value" => $this->value()
 			];
+			
+			if ($first_order_greeks) {
+				$total["first_order_greeks"] = [
+					"delta" => $this->delta(),
+					"theta" => $this->theta(),
+					"rho" => $this->rho(),
+					"vega" => $this->vega(),
+					"epsilon" => $this->epsilon()
+					// does not yet include lambda, which is delta * S/V
+				];
+			}
+			
+			if ($second_order_greeks) {
+				$total["second_order_greeks"] = [
+					"gamma" => $this->gamma()
+				];
+			}
+			
+			if ($third_order_greeks) {
+				$total["third_order_greeks"] = [
+					
+				];
+			}
 			
 			if ($sensitivities) {
 				$total["sensitivities"] = [

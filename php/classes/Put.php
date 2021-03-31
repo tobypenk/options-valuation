@@ -89,7 +89,7 @@
 	
 			$d1 = $this->d1();
 			
-			return $this->S * $this->t * $this->dividend_discount_factor() * normal_cdf(-$d1);			
+			return $this->S * $this->t * $this->dividend_discount_factor() * normal_cdf(-$d1) / 100;			
 		}
 
 		public function V_as_a_function_of_S($increment=0.1,$increments_plus_minus=40): array {

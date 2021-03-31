@@ -12,26 +12,7 @@
 	
 	class Call extends Option {
 		
-		public function summary($sensitivities = false) {
-			$total = [
-				"value" => $this->value(),
-				"delta" => $this->delta(),
-				"gamma" => $this->gamma(),
-				"theta" => $this->theta(),
-				"rho" => $this->rho(),
-				"vega" => $this->vega()
-			];
-			
-			if ($sensitivities) {
-				$total["sensitivities"] = [
-					"V_as_a_function_of_S" => $this->V_as_a_function_of_S(),
-					"V_as_a_function_of_volatility" => $this->V_as_a_function_of_volatility(),
-					"V_as_a_function_of_t" => $this->V_as_a_function_of_t()
-				];
-			}
-			
-			return $total;
-		}
+		
 	    
 		public function value(float $S = null, float $s = null, float $t = null): float {
 		
@@ -107,7 +88,7 @@
 	
 			$d1 = $this->d1();
 			
-			return -$this->S * $this->t * $this->dividend_discount_factor() * normal_cdf($d1);			
+			return -$this->S * $this->t * $this->dividend_discount_factor() * normal_cdf($d1) / 100;			
 		}
 		
 		public function V_as_a_function_of_S(float $increment=0.1, int $increments_plus_minus=40): array {
@@ -181,7 +162,7 @@
 		}
 	}
 	
-	echo json_encode((new Call(100,100,.05,30.0/365,.25,null,0.00))->summary());
-	echo json_encode((new Put(100,100,.05,30.0/365,.25,null,0.00))->summary());
+	echo json_encode((new Call(100,100,.05,30.0/365,.25,null,0.01))->summary());
+	echo json_encode((new Put(100,100,.05,30.0/365,.25,null,0.01))->summary());
 
 ?>
