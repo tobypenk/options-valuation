@@ -99,6 +99,17 @@
 			
 		}
 		
+		public function epsilon(): float {
+			
+			/*
+				returns epsilon, the change in option value with respect to a 1ppt change in dividend yield
+			*/
+	
+			$d1 = $this->d1();
+			
+			return -$this->S * $this->t * $this->dividend_discount_factor() * normal_cdf($d1);			
+		}
+		
 		public function V_as_a_function_of_S(float $increment=0.1, int $increments_plus_minus=40): array {
 		
 			/*
@@ -170,7 +181,7 @@
 		}
 	}
 	
-	echo json_encode((new Call(100,100,.05,30.0/365,.25,null,0.01))->summary());
-	echo json_encode((new Put(100,100,.05,30.0/365,.25,null,0.01))->summary());
+	echo json_encode((new Call(100,100,.05,30.0/365,.25,null,0.00))->summary());
+	echo json_encode((new Put(100,100,.05,30.0/365,.25,null,0.00))->summary());
 
 ?>

@@ -80,6 +80,17 @@
 	
 			return $v/100;
 		}
+		
+		public function epsilon(): float {
+			
+			/*
+				returns epsilon, the change in option value with respect to a 1ppt change in dividend yield
+			*/
+	
+			$d1 = $this->d1();
+			
+			return $this->S * $this->t * $this->dividend_discount_factor() * normal_cdf(-$d1);			
+		}
 
 		public function V_as_a_function_of_S($increment=0.1,$increments_plus_minus=40): array {
 		
