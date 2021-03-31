@@ -63,7 +63,8 @@
 			
 			if ($second_order_greeks) {
 				$total["second_order_greeks"] = [
-					"gamma" => $this->gamma()
+					"gamma" => $this->gamma(),
+					"vanna" => $this->vanna()
 				];
 			}
 			
@@ -154,6 +155,19 @@
 			$d1 = $this->d1();
 			return $this->S * exp(-$this->q * $this->t) * phi($d1) * sqrt($this->t) / 100;
 		}
+	    
+	    
+	    public function vanna(): float {
+		    
+		    /*
+			    returns the value of the second-order derivative of option value to volatility and spot price
+			*/
+			
+			return -$this->dividend_discount_factor() * phi($this->d1()) * $this->d2() / $this->s;
+	    }
+	    
+	    
+	    
 	    
 		public function implied_volatility($s=1.0,$precision=1e-5,$increment=1e-1,$max_iterations=1e4,$iterations=0) {
 			
