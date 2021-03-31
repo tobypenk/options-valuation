@@ -5,26 +5,40 @@
 	error_reporting(E_ALL);
 	
 	include_once "Call.php";
+	include_once "TestResult.php";
 	
 	class CallUnitTest extends Call {
 		
-		
-		public function epsilon_test($tolerance = 1e-6) {
-			$test_p = new Call($this->S,$this->K,$this->r,$this->t,$this->s,$this->V,$this->q + 0.0001);
-			$compare_p = $this->value() + $this->epsilon()/100 - $test_p->value();
+		public function epsilon_test(float $tolerance = 1e-6): TestResult {
 			
-			if (abs($compare_p) >= $tolerance) {
-				return "failed plus";
+			/*
+				implicit test of epsilon accuracy
+			*/
+			
+			$tmp_q = $this->q;
+			
+			foreach (range(-0.10,0.20,0.01) as $i) {
+				
+				$this->q = $i;
+				
+				$test_p = new Call($this->S,$this->K,$this->r,$this->t,$this->s,$this->V,$this->q + 0.0001);
+				$compare_p = $this->value() + $this->epsilon()/100 - $test_p->value();
+				
+				if (abs($compare_p) >= $tolerance) {
+					return new TestResult(false, "epsilon test failed",$this,$test_p);
+				}
+				
+				$test_m = new Call($this->S,$this->K,$this->r,$this->t,$this->s,$this->V,$this->q - 0.0001);
+				$compare_m = $this->value() - $this->epsilon()/100 - $test_m->value();
+				
+				if (abs($compare_m) >= $tolerance) {
+					return new TestResult(false, "epsilon test failed",$this,$test_m);
+				}
 			}
 			
-			$test_m = new Call($this->S,$this->K,$this->r,$this->t,$this->s,$this->V,$this->q - 0.0001);
-			$compare_m = $this->value() - $this->epsilon()/100 - $test_m->value();
+			$this->q = $tmp_q;
 			
-			if (abs($compare_m) >= $tolerance) {
-				return "failed minus";
-			}
-			
-			return "passed";
+			return new TestResult(true);
 		}
 		
 		
@@ -62,7 +76,13 @@
 	}
 	
 	
-	$CT = new CallUnitTest(100,100,.05,30.0/365,.25,null,0.01);
+	$CT = new CallUnitTest(10,8,.05,30.0/365,.25,null,0.01);
 	echo json_encode($CT->epsilon_test());
 	
 ?>
+
+
+
+
+
+
