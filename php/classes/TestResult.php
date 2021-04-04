@@ -4,15 +4,13 @@
 		
 		public bool $passed;
 		public ?string $message;
-		public ?Call $base;
-		public ?Call $test;
+		public ?array $parameters;
 		
-		public function __construct(bool $passed, ?string $message = null, ?Call $base = null, ?Call $test = null) {
+		public function __construct(bool $passed, ?string $message = null, ?array $parameters = null) {
 		    
 		    $this->passed = $passed;
 		    $this->message = $message;
-		    $this->base = $base;
-		    $this->test = $test;
+		    $this->parameters = $parameters;
 	    }
 	}
 	
