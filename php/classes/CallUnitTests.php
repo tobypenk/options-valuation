@@ -9,7 +9,7 @@
 	
 	class CallUnitTest extends Call {
 		
-		public function delta_test_explicit(float $tolerance = 1e-5): TestResult {
+		public function value_test_explicit(float $tolerance = 1e-5): TestResult {
 			
 			$base_option = new Call(100,100,.05,30.0/365,.25,null,0.01);
 			$predicted = $base_option->value();
@@ -21,11 +21,13 @@
 			} else {
 				return new TestResult(
 					false,
-					"explicit delta test failed",
+					"explicit value test failed",
 					["base_option"=>$base_option,"predicted_value"=>$predicted,"actual_value"=>$actual,"error"=>$error]
 				);
 			}
 		}
+		
+		
 		
 		
 		
@@ -49,14 +51,14 @@
 					$compare_p = $value + $delta * $factor - $test_p->value();
 					
 					if (abs($compare_p) >= $tolerance) {
-						return new TestResult(false, "delta test failed +",["base_option"=>$this,"test_option"=>$test_p]);
+						return new TestResult(false, "delta test failed +",["base_option"=>$this,"test_option"=>$test_p,"error"=>$compare_p]);
 					}
 					
 					$test_m = new Call($this->S-$factor,$this->K,$this->r,$this->t,$this->s,$this->V,$this->q);
 					$compare_m = $value - $delta * $factor - $test_m->value();
 					
 					if (abs($compare_m) >= $tolerance) {
-						return new TestResult(false, "delta test failed -",["base_option"=>$this,"test_option"=>$test_m]);
+						return new TestResult(false, "delta test failed -",["base_option"=>$this,"test_option"=>$test_m,"error"=>$compare_m]);
 					}
 				}
 			}
@@ -66,7 +68,6 @@
 			
 			return new TestResult(true);
 		}
-		
 		
 		
 		
@@ -164,13 +165,62 @@
 		
 		
 		
+		public function vega_test_explicit(float $tolerance = 1e-4): TestResult {
+			
+			$base_option = new Call(100,100,.05,30.0/365,.25,null,0.01);
+			$predicted = $base_option->vega();
+			$actual = 0.113992;
+			$error = $predicted - $actual;
+			
+			if (abs($error) < $tolerance) {
+				return new TestResult(true);
+			} else {
+				return new TestResult(
+					false,
+					"explicit vega test failed",
+					["base_option"=>$base_option,"predicted_value"=>$predicted,"actual_value"=>$actual,"error"=>$error]
+				);
+			}
+		}
 		
-		
-		public function vega_test_implicit(float $tolerance = 1e-6): TestResult {
+		public function vega_test_implicit(float $tolerance = 1e-5): TestResult {
 			// not yet implemented
 			//$C_vega_test = new Call(100,100,.05,30.0/365,.2501,null,0.01);
 			//echo $C->value() + $C->vega()/100 - $C_vega_test->value();
+			
+			$tmp_s = $this->s;
+			
+			foreach (range(0.01,3.0,0.01) as $i) {
+				
+				$this->s = $i;
+				
+				$vega = $this->vega();
+				$value = $this->value();
+				$factor = 1e-2;
+				
+				$test_p = new Call($this->S,$this->K,$this->r,$this->t,$this->s+$factor/100,$this->V,$this->q);
+				$compare_p = $value + $vega * $factor - $test_p->value();
+				
+				if (abs($compare_p) >= $tolerance) {
+					return new TestResult(false, "vega test failed +",["base_option"=>$this,"test_option"=>$test_p,"error"=>$compare_p]);
+				}
+				
+				$test_m = new Call($this->S,$this->K,$this->r,$this->t,$this->s-$factor/100,$this->V,$this->q);
+				$compare_m = $value - $vega * $factor - $test_m->value();
+				
+				if (abs($compare_m) >= $tolerance) {
+					return new TestResult(false, "vega test failed -",["base_option"=>$this,"test_option"=>$test_m,"error"=>$compare_m]);
+				}
+			}
+			
+			$this->s = $tmp_s;
+			
+			return new TestResult(true);
 		}
+		
+		
+		
+		
 		
 		public function rho_test_implicit(float $tolerance = 1e-6): TestResult {
 			// not yet implemented
@@ -197,14 +247,18 @@
 	}
 	
 	
-	$CT = new CallUnitTest(10,8,.05,30.0/365,.25,null,0.01);
+	$CT = new CallUnitTest(100,100,.05,30.0/365,.25,null,0.01);
 	//echo json_encode($CT->theta_test_explicit());
 	//echo json_encode($CT->delta_test_explicit());
 	//echo json_encode($CT->epsilon_test_implicit());
 	//echo json_encode($CT->delta_test_implicit());
-	echo json_encode($CT->theta_test_implicit());
+	//echo json_encode($CT->theta_test_implicit());
+	//echo json_encode($CT->vega_test_implicit());
+	echo json_encode($CT->vega_test_explicit());
 	
+
 	
+	//echo $CT->vega();
 	
 
 	
