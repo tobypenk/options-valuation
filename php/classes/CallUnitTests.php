@@ -9,6 +9,28 @@
 	
 	class CallUnitTest extends Call {
 		
+		
+		
+		public function delta_test_explicit(float $tolerance = 1e-5): TestResult {
+			
+			$base_option = new Call(100,100,.05,30.0/365,.25,null,0.01);
+			$predicted = $base_option->value();
+			$actual = 3.018663;
+			$error = $predicted - $actual;
+			
+			if (abs($error) < $tolerance) {
+				return new TestResult(true);
+			} else {
+				return new TestResult(
+					false,
+					"explicit delta test failed",
+					["base_option"=>$base_option,"predicted_value"=>$predicted,"actual_value"=>$actual,"error"=>$error]
+				);
+			}
+		}
+		
+		
+		
 		public function delta_test_implicit(float $tolerance = 1e-6): TestResult {
 			
 			$tmp_S = $this->S;
@@ -29,16 +51,15 @@
 					$compare_p = $value + $delta * $factor - $test_p->value();
 					
 					if (abs($compare_p) >= $tolerance) {
-						return new TestResult(false, "delta test failed +",$this,$test_p);
+						return new TestResultImplicit(false, "delta test failed +",["base_option"=>$this,"test_option"=>$test_p]);
 					}
 					
 					$test_m = new Call($this->S-$factor,$this->K,$this->r,$this->t,$this->s,$this->V,$this->q);
 					$compare_m = $value - $delta * $factor - $test_m->value();
 					
 					if (abs($compare_m) >= $tolerance) {
-						return new TestResult(false, "delta test failed -",$this,$test_m);
+						return new TestResultImplicit(false, "delta test failed -",["base_option"=>$this,"test_option"=>$test_m]);
 					}
-					
 				}
 			}
 			
@@ -66,14 +87,14 @@
 				$compare_p = $value + $epsilon / 100 - $test_p->value();
 				
 				if (abs($compare_p) >= $tolerance) {
-					return new TestResult(false, "epsilon test failed",$this,$test_p);
+					return new TestResult(false, "epsilon test failed",["base_option"=>$this,"test_option"=>$test_p]);
 				}
 				
 				$test_m = new Call($this->S,$this->K,$this->r,$this->t,$this->s,$this->V,$this->q - 0.0001);
 				$compare_m = $value - $epsilon / 100 - $test_m->value();
 				
 				if (abs($compare_m) >= $tolerance) {
-					return new TestResult(false, "epsilon test failed",$this,$test_m);
+					return new TestResult(false, "epsilon test failed",["base_option"=>$this,"test_option"=>$test_m]);
 				}
 			}
 			
@@ -81,7 +102,6 @@
 			
 			return new TestResult(true);
 		}
-		
 		
 		
 		
@@ -125,7 +145,8 @@
 	
 	
 	$CT = new CallUnitTest(10,8,.05,30.0/365,.25,null,0.01);
-	//echo json_encode($CT->epsilon_test());
+	echo json_encode($CT->delta_test_explicit());
+	//echo json_encode($CT->epsilon_test_implicit());
 	//echo json_encode($CT->delta_test_implicit());
 	
 	
