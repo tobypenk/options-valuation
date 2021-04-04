@@ -29,7 +29,23 @@
 		
 		
 		
-		
+		public function delta_test_explicit(float $tolerance = 1e-3): TestResult {
+			
+			$base_option = new Call(100,100,.05,30.0/365,.25,null,0.01);
+			$predicted = $base_option->delta();
+			$actual = 0.53256;
+			$error = $predicted - $actual;
+			
+			if (abs($error) < $tolerance) {
+				return new TestResult(true);
+			} else {
+				return new TestResult(
+					false,
+					"explicit delta test failed",
+					["base_option"=>$base_option,"predicted_value"=>$predicted,"actual_value"=>$actual,"error"=>$error]
+				);
+			}
+		}
 		
 		public function delta_test_implicit(float $tolerance = 1e-6): TestResult {
 			
@@ -254,7 +270,8 @@
 	//echo json_encode($CT->delta_test_implicit());
 	//echo json_encode($CT->theta_test_implicit());
 	//echo json_encode($CT->vega_test_implicit());
-	echo json_encode($CT->vega_test_explicit());
+	echo json_encode($CT->delta_test_explicit());
+	//echo json_encode($CT->delta());
 	
 
 	
