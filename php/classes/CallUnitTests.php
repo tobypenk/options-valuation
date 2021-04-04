@@ -9,8 +9,6 @@
 	
 	class CallUnitTest extends Call {
 		
-		
-		
 		public function delta_test_explicit(float $tolerance = 1e-5): TestResult {
 			
 			$base_option = new Call(100,100,.05,30.0/365,.25,null,0.01);
@@ -51,14 +49,14 @@
 					$compare_p = $value + $delta * $factor - $test_p->value();
 					
 					if (abs($compare_p) >= $tolerance) {
-						return new TestResultImplicit(false, "delta test failed +",["base_option"=>$this,"test_option"=>$test_p]);
+						return new TestResult(false, "delta test failed +",["base_option"=>$this,"test_option"=>$test_p]);
 					}
 					
 					$test_m = new Call($this->S-$factor,$this->K,$this->r,$this->t,$this->s,$this->V,$this->q);
 					$compare_m = $value - $delta * $factor - $test_m->value();
 					
 					if (abs($compare_m) >= $tolerance) {
-						return new TestResultImplicit(false, "delta test failed -",["base_option"=>$this,"test_option"=>$test_m]);
+						return new TestResult(false, "delta test failed -",["base_option"=>$this,"test_option"=>$test_m]);
 					}
 				}
 			}
@@ -68,6 +66,65 @@
 			
 			return new TestResult(true);
 		}
+		
+		
+		
+		
+		
+		public function theta_test_explicit(float $tolerance = 1e-4): TestResult {
+			
+			$base_option = new Call(100,100,.05,30.0/365,.25,null,0.01);
+			$predicted = $base_option->theta();
+			$actual = -0.0529;
+			$error = $predicted - $actual;
+			
+			if (abs($error) < $tolerance) {
+				return new TestResult(true);
+			} else {
+				return new TestResult(
+					false,
+					"explicit theta test failed",
+					["base_option"=>$base_option,"predicted_value"=>$predicted,"actual_value"=>$actual,"error"=>$error]
+				);
+			}
+		}
+		
+		public function theta_test_implicit(float $tolerance = 1e-6): TestResult {
+			// not yet implemented
+			//$C_theta_test = new Call(100,100,.05,30.01/365,.25,null,0.01);
+			//echo $C->value() - $C->theta()/100 - $C_theta_test->value();
+
+			$tmp_t = $this->t;
+
+
+			foreach (range(1,40,1) as $j) {
+					
+				$this->t = $j/365;
+				$theta = $this->theta();
+				$value = $this->value();
+				$factor = 1e-2;
+				
+				$test_p = new Call($this->S,$this->K,$this->r,($j+$factor)/365,$this->s,$this->V,$this->q);
+				$compare_p = $value - $theta * $factor - $test_p->value();
+				
+				if (abs($compare_p) >= $tolerance) {
+					return new TestResult(false, "theta test failed +",["base_option"=>$this,"test_option"=>$test_p,"error"=>$compare_p]);
+				}
+				
+				$test_m = new Call($this->S,$this->K,$this->r,($j-$factor)/365,$this->s,$this->V,$this->q);
+				$compare_m = $value + $theta * $factor - $test_m->value();
+				
+				if (abs($compare_m) >= $tolerance) {
+					return new TestResult(false, "theta test failed -",["base_option"=>$this,"test_option"=>$test_m,"error"=>$compare_m]);
+				}
+			}
+			
+			$this->t <- $tmp_t;
+			
+			return new TestResult(true);
+		}
+		
+		
 		
 		public function epsilon_test_implicit(float $tolerance = 1e-6): TestResult {
 			
@@ -107,11 +164,7 @@
 		
 		
 		
-		public function theta_test_implicit(float $tolerance = 1e-6): TestResult {
-			// not yet implemented
-			//$C_theta_test = new Call(100,100,.05,30.01/365,.25,null,0.01);
-			//echo $C->value() - $C->theta()/100 - $C_theta_test->value();
-		}
+		
 		
 		public function vega_test_implicit(float $tolerance = 1e-6): TestResult {
 			// not yet implemented
@@ -145,9 +198,11 @@
 	
 	
 	$CT = new CallUnitTest(10,8,.05,30.0/365,.25,null,0.01);
-	echo json_encode($CT->delta_test_explicit());
+	//echo json_encode($CT->theta_test_explicit());
+	//echo json_encode($CT->delta_test_explicit());
 	//echo json_encode($CT->epsilon_test_implicit());
 	//echo json_encode($CT->delta_test_implicit());
+	echo json_encode($CT->theta_test_implicit());
 	
 	
 	
