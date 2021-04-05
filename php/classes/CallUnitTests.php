@@ -240,9 +240,45 @@
 		
 		public function rho_test_implicit(float $tolerance = 1e-6): TestResult {
 			// not yet implemented
+			
+			
 			//$C_rho_test = new Call(100,100,.0501,30.0/365,.25,null,0.01);
 			//echo $C->value() + $C->rho()/100 - $C_rho_test->value();
+			
+			
+			$tmp_r = $this->r;
+			
+			foreach (range(0.01,0.12,0.01) as $i) {
+				
+				$this->r = $i;
+				$rho = $this->rho();
+				$value = $this->value();
+				$factor = 1e-2;
+				
+				$test_p = new Call($this->S,$this->K,$this->r + $factor / 100,$this->t,$this->s,$this->V,$this->q);
+				$compare_p = $value + $rho / 100 - $test_p->value();
+				
+				if (abs($compare_p) >= $tolerance) {
+					return new TestResult(false, "rho test failed",["base_option"=>$this,"test_option"=>$test_p]);
+				}
+				
+				$test_m = new Call($this->S,$this->K,$this->r - $factor / 100,$this->t,$this->s,$this->V,$this->q);
+				$compare_m = $value - $rho / 100 - $test_m->value();
+				
+				if (abs($compare_m) >= $tolerance) {
+					return new TestResult(false, "rho test failed",["base_option"=>$this,"test_option"=>$test_m]);
+				}
+			}
+			
+			$this->r = $tmp_r;
+			
+			return new TestResult(true);
 		}
+		
+		
+		
+		
+		
 		
 		public function vanna_test_implicit(float $tolerance = 1e-6): TestResult {
 			// not yet implemented
@@ -270,9 +306,11 @@
 	//echo json_encode($CT->delta_test_implicit());
 	//echo json_encode($CT->theta_test_implicit());
 	//echo json_encode($CT->vega_test_implicit());
-	echo json_encode($CT->delta_test_explicit());
+	//echo json_encode($CT->delta_test_explicit());
 	//echo json_encode($CT->delta());
 	
+	
+	echo json_encode($CT->rho_test_implicit());
 
 	
 	//echo $CT->vega();
