@@ -9,6 +9,22 @@
 	
 	class CallUnitTest extends Call {
 		
+		public function battery(): array {
+			
+			return [
+				$this->value_test_explicit(),
+				$this->delta_test_explicit(),
+				$this->delta_test_implicit(),
+				$this->theta_test_explicit(),
+				$this->theta_test_implicit(),
+				$this->epsilon_test_implicit(),
+				$this->vega_test_explicit(),
+				$this->vega_test_implicit(),
+				$this->rho_test_explicit(),
+				$this->rho_test_implicit(),
+			];
+		}
+		
 		public function value_test_explicit(float $tolerance = 1e-5): TestResult {
 			
 			$base_option = new Call(100,100,.05,30.0/365,.25,null,0.01);
@@ -26,8 +42,6 @@
 				);
 			}
 		}
-		
-		
 		
 		public function delta_test_explicit(float $tolerance = 1e-3): TestResult {
 			
@@ -85,9 +99,6 @@
 			return new TestResult(true);
 		}
 		
-		
-		
-		
 		public function theta_test_explicit(float $tolerance = 1e-4): TestResult {
 			
 			$base_option = new Call(100,100,.05,30.0/365,.25,null,0.01);
@@ -106,7 +117,7 @@
 			}
 		}
 		
-		public function theta_test_implicit(float $tolerance = 1e-6): TestResult {
+		public function theta_test_implicit(float $tolerance = 1e-5): TestResult {
 			// not yet implemented
 			//$C_theta_test = new Call(100,100,.05,30.01/365,.25,null,0.01);
 			//echo $C->value() - $C->theta()/100 - $C_theta_test->value();
@@ -141,8 +152,6 @@
 			return new TestResult(true);
 		}
 		
-		
-		
 		public function epsilon_test_implicit(float $tolerance = 1e-6): TestResult {
 			
 			/*
@@ -176,10 +185,6 @@
 			
 			return new TestResult(true);
 		}
-		
-		
-		
-		
 		
 		public function vega_test_explicit(float $tolerance = 1e-4): TestResult {
 			
@@ -234,9 +239,23 @@
 			return new TestResult(true);
 		}
 		
-		
-		
-		
+		public function rho_test_explicit(float $tolerance = 1e-6): TestResult {
+			
+			$base_option = new Call(100,100,.05,30.0/365,.25,null,0.01);
+			$predicted = $base_option->rho();
+			$actual = 0.041255;
+			$error = $predicted - $actual;
+			
+			if (abs($error) < $tolerance) {
+				return new TestResult(true);
+			} else {
+				return new TestResult(
+					false,
+					"explicit rho test failed",
+					["base_option"=>$base_option,"predicted_value"=>$predicted,"actual_value"=>$actual,"error"=>$error]
+				);
+			}
+		}
 		
 		public function rho_test_implicit(float $tolerance = 1e-6): TestResult {
 			// not yet implemented
@@ -275,13 +294,9 @@
 			return new TestResult(true);
 		}
 		
-		
-		
-		
-		
-		
 		public function vanna_test_implicit(float $tolerance = 1e-6): TestResult {
 			// not yet implemented
+			
 			////dvegadspot
 			//$C_vanna_test = new Call(100.01,100,.05,30.0/365,.25,null,0.01);
 			//echo $C->vega() * (1 + $C->vanna()/100) - $C_vanna_test->vega();
@@ -289,35 +304,24 @@
 			//ddeltadvol
 			//$C_vanna_test_2 = new Call(100,100,.05,30.0/365,.2501,null,0.01);
 			//echo $C->delta() + $C->vanna()/100 - $C_vanna_test_2->delta();
-		}
-		
-		
-/*
-		$P = new Put(100,100,.05,30.0/365,.25,null,0.01);
-*/
-		
+		}	
 	}
 	
 	
-	$CT = new CallUnitTest(100,100,.05,30.0/365,.25,null,0.01);
-	//echo json_encode($CT->theta_test_explicit());
-	//echo json_encode($CT->delta_test_explicit());
-	//echo json_encode($CT->epsilon_test_implicit());
-	//echo json_encode($CT->delta_test_implicit());
-	//echo json_encode($CT->theta_test_implicit());
-	//echo json_encode($CT->vega_test_implicit());
-	//echo json_encode($CT->delta_test_explicit());
-	//echo json_encode($CT->delta());
-	
-	
-	echo json_encode($CT->rho_test_implicit());
-
-	
-	//echo $CT->vega();
-	
-
+	$C = new CallUnitTest(100,100,.05,30.0/365,.25,null,0.01);
+	echo json_encode($C->battery());
 	
 ?>
+
+
+
+
+
+
+
+
+
+
 
 
 
