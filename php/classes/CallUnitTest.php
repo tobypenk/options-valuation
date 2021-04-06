@@ -118,10 +118,7 @@
 		}
 		
 		private function theta_test_implicit(float $tolerance = 1e-5): TestResult {
-			// not yet implemented
-			//$C_theta_test = new Call(100,100,.05,30.01/365,.25,null,0.01);
-			//echo $C->value() - $C->theta()/100 - $C_theta_test->value();
-
+			
 			$tmp_t = $this->t;
 
 
@@ -306,6 +303,8 @@
 			//echo $C->delta() + $C->vanna()/100 - $C_vanna_test_2->delta();
 		}	
 	}
+	
+	echo json_encode((new CallUnitTest(100,100,0.05,30/360,.25,null,0.01))->battery());
 	
 
 ?>
