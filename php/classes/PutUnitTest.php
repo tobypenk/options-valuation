@@ -27,12 +27,6 @@
 			}
 		}
 		
-		
-		
-		
-		
-		
-		
 		public function delta_test_explicit(float $tolerance = 1e-6): TestResult {
 			
 			$base_option = new Put(100,100,.05,30.0/365,.25,null,0.01);
@@ -50,9 +44,6 @@
 				);
 			}
 		}
-		
-		
-		
 		
 		public function delta_test_implicit(float $tolerance = 1e-6): TestResult {
 			
@@ -93,13 +84,32 @@
 		}
 		
 		
+		private function theta_test_explicit(float $tolerance = 1e-4): TestResult {
+			
+			$base_option = new Put(100,100,.05,30.0/365,.25,null,0.01);
+			$predicted = $base_option->theta();
+			$actual = -0.0430;
+			$error = $predicted - $actual;
+			
+			if (abs($error) < $tolerance) {
+				return new TestResult(true);
+			} else {
+				return new TestResult(
+					false,
+					"explicit theta test failed",
+					["base_option"=>$base_option,"predicted_value"=>$predicted,"actual_value"=>$actual,"error"=>$error]
+				);
+			}
+		}
+		
+		
 		
 		
 		
 	}
 	
 	$P = new PutUnitTest(100,100,0.05,30/365,0.25,null,0.01);
-	echo json_encode($P->delta_test_implicit());
+	echo json_encode($P->theta_test_explicit());
 	
 ?>
 
