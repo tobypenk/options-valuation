@@ -9,12 +9,28 @@
 	
 	class PutUnitTest extends Put {
 		
-		public function value_test_explicit(float $tolerance = 1e-5): TestResult {
+		public function battery(): array {
 			
-			$base_option = new Put(100,100,.05,30.0/365,.25,null,0.01);
+			return [
+				$this->value_test_explicit(2.690706, new Put(100,100,.05,30.0/365,.25,null,0.01)),
+				$this->delta_test_explicit(-0.46744, new Put(100,100,.05,30.0/365,.25,null,0.01)),
+				$this->delta_test_implicit(),
+				$this->theta_test_explicit(-0.0430, new Put(100,100,.05,30.0/365,.25,null,0.01)),
+				$this->theta_test_implicit(),
+				//$this->epsilon_test_implicit(),
+				//$this->vega_test_explicit(),
+				//$this->vega_test_implicit(),
+				//$this->rho_test_explicit(),
+				//$this->rho_test_implicit(),
+			];
+		}
+		
+		
+		
+		public function value_test_explicit(float $known_value, Option $base_option, float $tolerance = 1e-5): TestResult {
+			
 			$predicted = $base_option->value();
-			$actual = 2.690706;
-			$error = $predicted - $actual;
+			$error = $predicted - $known_value;
 			
 			if (abs($error) < $tolerance) {
 				return new TestResult(true);
@@ -27,12 +43,10 @@
 			}
 		}
 		
-		public function delta_test_explicit(float $tolerance = 1e-6): TestResult {
+		public function delta_test_explicit(float $known_value, Option $base_option, float $tolerance = 1e-6): TestResult {
 			
-			$base_option = new Put(100,100,.05,30.0/365,.25,null,0.01);
 			$predicted = $base_option->delta();
-			$actual = -0.46744;
-			$error = $predicted - $actual;
+			$error = $predicted - $known_value;
 			
 			if (abs($error) < $tolerance) {
 				return new TestResult(true);
@@ -83,13 +97,11 @@
 			return new TestResult(true);
 		}
 		
-		
-		public function theta_test_explicit(float $tolerance = 2e-3): TestResult {
+		public function theta_test_explicit(float $known_value, Option $base_option, float $tolerance = 2e-3): TestResult {
 			
 			$base_option = new Put(100,100,.05,30.0/365,.25,null,0.01);
 			$predicted = $base_option->theta();
-			$actual = -0.0430;
-			$error = $predicted - $actual;
+			$error = $predicted - $known_value;
 			
 			if (abs($error) < $tolerance) {
 				return new TestResult(true);
@@ -104,10 +116,28 @@
 		
 		public function theta_test_implicit(float $tolerance = 1e-5): TestResult {
 			
+			/*
+				performs an implicit test of accuracy of theta, the change in option value with respect to 
+					the passage of one day.
+					
+				implicit testing assumes the value method for the class (or parent class) is accurate.
+				models the change in option value for a given dtheta using:
+					
+					prediction: v + dv/dtheta
+					actual: valuation given t = t + dtheta
+					
+				parameters:
+					tolerance: the maximum allowable error between predicted and actual values to return success
+				
+				returns:
+					TestResult object representing the success or failure of the test. returns metadata about the 
+						specific configuration of parameters that failed if unsuccessful.
+			*/
+			
 			$tmp_t = $this->t;
 
 			foreach (range(1,40,1) as $j) {
-					
+				
 				$this->t = $j/365;
 				$theta = $this->theta();
 				$value = $this->value();
@@ -133,13 +163,46 @@
 			return new TestResult(true);
 		}
 		
+		public function epsilon_test_implicit(float $tolerance = 1e-6): TestResult {
+			
+			/*
+				not yet done
+			*/
+			
+			$tmp_q = $this->q;
+			
+			foreach (range(-0.10,0.20,0.01) as $i) {
+				
+				$this->q = $i;
+				$epsilon = $this->epsilon();
+				$value = $this->value();
+				
+				$test_p = new Put($this->S,$this->K,$this->r,$this->t,$this->s,$this->V,$this->q + 0.0001);
+				$compare_p = $value + $epsilon / 100 - $test_p->value();
+				
+				if (abs($compare_p) >= $tolerance) {
+					return new TestResult(false, "epsilon test failed",["base_option"=>$this,"test_option"=>$test_p,"error"=>$compare_p]);
+				}
+				
+				$test_m = new Put($this->S,$this->K,$this->r,$this->t,$this->s,$this->V,$this->q - 0.0001);
+				$compare_m = $value - $epsilon / 100 - $test_m->value();
+				
+				if (abs($compare_m) >= $tolerance) {
+					return new TestResult(false, "epsilon test failed",["base_option"=>$this,"test_option"=>$test_m,"error"=>$compare_m]);
+				}
+			}
+			
+			$this->q = $tmp_q;
+			
+			return new TestResult(true);
+		}
 		
 		
 		
 	}
 	
 	$P = new PutUnitTest(100,100,0.05,30/360,0.25,null,0.01);
-	echo json_encode($P->theta_test_implicit());
+	echo json_encode($P->battery());
 	
 ?>
 
