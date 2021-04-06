@@ -54,13 +54,52 @@
 		
 		
 		
+		public function delta_test_implicit(float $tolerance = 1e-6): TestResult {
+			
+			$tmp_S = $this->S;
+			$tmp_K = $this->K;
+			
+			foreach (range(1,200,1) as $i) {
+				
+				$this->S = $i;
+				
+				foreach (range(max(0.1,$i*0.8),$i*1.2,$i*0.1) as $j) {
+					
+					$this->K = $j;
+					$delta = $this->delta();
+					$value = $this->value();
+					$factor = 1e-4;
+					
+					$test_p = new Put($this->S+$factor,$this->K,$this->r,$this->t,$this->s,$this->V,$this->q);
+					$compare_p = $value + $delta * $factor - $test_p->value();
+					
+					if (abs($compare_p) >= $tolerance) {
+						return new TestResult(false, "delta test failed +",["base_option"=>$this,"test_option"=>$test_p,"error"=>$compare_p]);
+					}
+					
+					$test_m = new Put($this->S-$factor,$this->K,$this->r,$this->t,$this->s,$this->V,$this->q);
+					$compare_m = $value - $delta * $factor - $test_m->value();
+					
+					if (abs($compare_m) >= $tolerance) {
+						return new TestResult(false, "delta test failed -",["base_option"=>$this,"test_option"=>$test_m,"error"=>$compare_m]);
+					}
+				}
+			}
+			
+			$this->S = $tmp_S;
+			$this->K = $tmp_K;
+			
+			return new TestResult(true);
+		}
+		
+		
 		
 		
 		
 	}
 	
 	$P = new PutUnitTest(100,100,0.05,30/365,0.25,null,0.01);
-	echo json_encode($P->delta_test_explicit());
+	echo json_encode($P->delta_test_implicit());
 	
 ?>
 
