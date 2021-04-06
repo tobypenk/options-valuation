@@ -84,7 +84,7 @@
 		}
 		
 		
-		private function theta_test_explicit(float $tolerance = 1e-4): TestResult {
+		public function theta_test_explicit(float $tolerance = 2e-3): TestResult {
 			
 			$base_option = new Put(100,100,.05,30.0/365,.25,null,0.01);
 			$predicted = $base_option->theta();
@@ -102,14 +102,44 @@
 			}
 		}
 		
+		public function theta_test_implicit(float $tolerance = 1e-5): TestResult {
+			
+			$tmp_t = $this->t;
+
+			foreach (range(1,40,1) as $j) {
+					
+				$this->t = $j/365;
+				$theta = $this->theta();
+				$value = $this->value();
+				$factor = 1e-2;
+				
+				$test_p = new Put($this->S,$this->K,$this->r,($j+$factor)/365,$this->s,$this->V,$this->q);
+				$compare_p = $value - $theta * $factor - $test_p->value();
+				
+				if (abs($compare_p) >= $tolerance) {
+					return new TestResult(false, "theta test failed +",["base_option"=>$this,"test_option"=>$test_p,"error"=>$compare_p]);
+				}
+				
+				$test_m = new Put($this->S,$this->K,$this->r,($j-$factor)/365,$this->s,$this->V,$this->q);
+				$compare_m = $value + $theta * $factor - $test_m->value();
+				
+				if (abs($compare_m) >= $tolerance) {
+					return new TestResult(false, "theta test failed -",["base_option"=>$this,"test_option"=>$test_m,"error"=>$compare_m]);
+				}
+			}
+			
+			$this->t <- $tmp_t;
+			
+			return new TestResult(true);
+		}
 		
 		
 		
 		
 	}
 	
-	$P = new PutUnitTest(100,100,0.05,30/365,0.25,null,0.01);
-	echo json_encode($P->theta_test_explicit());
+	$P = new PutUnitTest(100,100,0.05,30/360,0.25,null,0.01);
+	echo json_encode($P->theta_test_implicit());
 	
 ?>
 
