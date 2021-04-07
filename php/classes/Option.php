@@ -143,7 +143,9 @@
 					measures convexity, the second-order derivative of option value w.r.t. asset value
 			*/
 			
-			return phi($this->d1())/($this->S*$this->s*sqrt($this->t));
+			//return phi($this->d1())/($this->S*$this->s*sqrt($this->t));
+			
+			return ($this->vega() / $this->S) * (1 - $this->d1()/($this->s * sqrt($this->t)));
 		}
 	    
 	    public function vega(): float {
@@ -156,18 +158,18 @@
 			return $this->S * exp(-$this->q * $this->t) * phi($d1) * sqrt($this->t) / 100;
 		}
 	    
-	    
 	    public function vanna(): float {
 		    
 		    /*
 			    returns the value of the second-order derivative of option value to volatility and spot price
 			*/
 			
-			return -$this->dividend_discount_factor() * phi($this->d1()) * $this->d2() / $this->s;
+			$method1 = -$this->dividend_discount_factor() * phi($this->d1()) * $this->d2() / $this->s;
+			//$method2 = ($this->vega() / $this->S) * (1 - $this->d1() / ($this->s * sqrt($this->t)));
+
+			return $method1;
+
 	    }
-	    
-	    
-	    
 	    
 		public function implied_volatility($s=1.0,$precision=1e-5,$increment=1e-1,$max_iterations=1e4,$iterations=0) {
 			

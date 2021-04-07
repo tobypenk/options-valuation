@@ -12,8 +12,6 @@
 	
 	class Call extends Option {
 		
-		
-	    
 		public function value(float $S = null, float $s = null, float $t = null): float {
 		
 			/*
@@ -162,7 +160,32 @@
 		}
 	}
 	
-	echo json_encode((new Call(100,100,.05,30.0/365,.25,null,0.01))->summary());
-	echo json_encode((new Put(100,100,.05,30.0/365,.25,null,0.01))->summary());
+	
+	
+	$C = new Call(100,100,.05,30.0/365,.25,null,0.01);
+	$C_vanna_test = new Call(100.01,100,.05,30.0/365,.25,null,0.01);
+	//echo 1 - ($C->vega() * (1 + $C->vanna()/100)) / $C_vanna_test->vega();
+
+	/*
+
+	$C = new Call(100,100,.05,30.0/365,.25,null,0.01);
+	$C_delta_test = new Call(100.01,100,.05,30.0/365,.25,null,0.01);
+	echo 1 - ($C->value() + $C->delta()/100) / $C_delta_test->value();
+	
+	$C_delta_test = new Call(100.01,100,.05,30.0/365,.25,null,0.01);
+	echo $C->value() + $C->delta()/100 - $C_delta_test->value();
+*/
+
 
 ?>
+
+
+
+
+
+
+
+
+
+
+

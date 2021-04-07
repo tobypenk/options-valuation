@@ -157,7 +157,7 @@
 			
 			$tmp_q = $this->q;
 			
-			foreach (range(-0.10,0.20,0.01) as $i) {
+			foreach (range(0.0,0.20,0.01) as $i) {
 				
 				$this->q = $i;
 				$epsilon = $this->epsilon();
@@ -202,9 +202,6 @@
 		}
 		
 		private function vega_test_implicit(float $tolerance = 1e-5): TestResult {
-			// not yet implemented
-			//$C_vega_test = new Call(100,100,.05,30.0/365,.2501,null,0.01);
-			//echo $C->value() + $C->vega()/100 - $C_vega_test->value();
 			
 			$tmp_s = $this->s;
 			
@@ -255,12 +252,6 @@
 		}
 		
 		private function rho_test_implicit(float $tolerance = 1e-6): TestResult {
-			// not yet implemented
-			
-			
-			//$C_rho_test = new Call(100,100,.0501,30.0/365,.25,null,0.01);
-			//echo $C->value() + $C->rho()/100 - $C_rho_test->value();
-			
 			
 			$tmp_r = $this->r;
 			
