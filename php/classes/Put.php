@@ -97,6 +97,11 @@
 			/*
 				numeric approximation of option value with respect to underlying asset price - assumes all inputs besides
 					underlying asset price are held constant
+					
+				parameters:
+					increment: the spacing between steps for each test
+					increments_plus_minus: the number of increments in each direction to test
+					(consumes instance parameters for S, s, and t)
 				
 				returns:
 					sensitivities (array of floats, length increments_plus_minus * 2 + 1) representing value of option at
