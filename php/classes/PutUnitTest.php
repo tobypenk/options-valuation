@@ -18,10 +18,10 @@
 				$this->theta_test_explicit(-0.0430, new Put(100,100,.05,30.0/365,.25,null,0.01)),
 				$this->theta_test_implicit(),
 				$this->epsilon_test_implicit(),
-				$this->vega_test_explicit(),
+				$this->vega_test_explicit(0.113992),
 				$this->vega_test_implicit(),
-				$this->rho_test_explicit(),
-				//$this->rho_test_implicit(),
+				$this->rho_test_explicit(-0.0406),
+				$this->rho_test_implicit(),
 			];
 		}
 		
@@ -198,12 +198,11 @@
 			return new TestResult(true);
 		}
 		
-		public function vega_test_explicit(float $tolerance = 1e-4): TestResult {
+		public function vega_test_explicit(float $known_value, float $tolerance = 1e-4): TestResult {
 			
 			$base_option = new Put(100,100,.05,30.0/365,.25,null,0.01);
 			$predicted = $base_option->vega();
-			$actual = 0.113992;
-			$error = $predicted - $actual;
+			$error = $predicted - $known_value;
 			
 			if (abs($error) < $tolerance) {
 				return new TestResult(true);
@@ -248,12 +247,11 @@
 			return new TestResult(true);
 		}
 		
-		private function rho_test_explicit(float $tolerance = 1e-6): TestResult {
+		private function rho_test_explicit(float $known_value, float $tolerance = 1e-6): TestResult {
 			
 			$base_option = new Put(100,100,.05,30.0/365,.25,null,0.01);
 			$predicted = $base_option->rho();
-			$actual = -0.0406;
-			$error = $predicted - $actual;
+			$error = $predicted - $known_value;
 			
 			if (abs($error) < $tolerance) {
 				return new TestResult(true);
