@@ -266,6 +266,37 @@
 			}
 		}
 		
+		private function rho_test_implicit(float $tolerance = 1e-6): TestResult {
+			
+			$tmp_r = $this->r;
+			
+			foreach (range(0.01,0.12,0.01) as $i) {
+				
+				$this->r = $i;
+				$rho = $this->rho();
+				$value = $this->value();
+				$factor = 1e-2;
+				
+				$test_p = new Put($this->S,$this->K,$this->r + $factor / 100,$this->t,$this->s,$this->V,$this->q);
+				$compare_p = $value + $rho / 100 - $test_p->value();
+				
+				if (abs($compare_p) >= $tolerance) {
+					return new TestResult(false, "rho test failed",["base_option"=>$this,"test_option"=>$test_p]);
+				}
+				
+				$test_m = new Put($this->S,$this->K,$this->r - $factor / 100,$this->t,$this->s,$this->V,$this->q);
+				$compare_m = $value - $rho / 100 - $test_m->value();
+				
+				if (abs($compare_m) >= $tolerance) {
+					return new TestResult(false, "rho test failed",["base_option"=>$this,"test_option"=>$test_m]);
+				}
+			}
+			
+			$this->r = $tmp_r;
+			
+			return new TestResult(true);
+		}
+		
 		
 		
 		
