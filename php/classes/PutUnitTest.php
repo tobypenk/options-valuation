@@ -20,7 +20,7 @@
 				$this->epsilon_test_implicit(),
 				$this->vega_test_explicit(),
 				$this->vega_test_implicit(),
-				//$this->rho_test_explicit(),
+				$this->rho_test_explicit(),
 				//$this->rho_test_implicit(),
 			];
 		}
@@ -216,7 +216,6 @@
 			}
 		}
 		
-		
 		private function vega_test_implicit(float $tolerance = 1e-5): TestResult {
 			
 			$tmp_s = $this->s;
@@ -248,6 +247,25 @@
 			
 			return new TestResult(true);
 		}
+		
+		private function rho_test_explicit(float $tolerance = 1e-6): TestResult {
+			
+			$base_option = new Put(100,100,.05,30.0/365,.25,null,0.01);
+			$predicted = $base_option->rho();
+			$actual = -0.0406;
+			$error = $predicted - $actual;
+			
+			if (abs($error) < $tolerance) {
+				return new TestResult(true);
+			} else {
+				return new TestResult(
+					false,
+					"explicit rho test failed",
+					["base_option"=>$base_option,"predicted_value"=>$predicted,"actual_value"=>$actual,"error"=>$error]
+				);
+			}
+		}
+		
 		
 		
 		
