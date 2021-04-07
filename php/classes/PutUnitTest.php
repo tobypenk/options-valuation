@@ -17,7 +17,7 @@
 				$this->delta_test_implicit(),
 				$this->theta_test_explicit(-0.0430, new Put(100,100,.05,30.0/365,.25,null,0.01)),
 				$this->theta_test_implicit(),
-				//$this->epsilon_test_implicit(),
+				$this->epsilon_test_implicit(),
 				//$this->vega_test_explicit(),
 				//$this->vega_test_implicit(),
 				//$this->rho_test_explicit(),
@@ -171,24 +171,25 @@
 			
 			$tmp_q = $this->q;
 			
-			foreach (range(-0.10,0.20,0.01) as $i) {
+			foreach (range(0.,0.20,0.01) as $i) {
 				
 				$this->q = $i;
 				$epsilon = $this->epsilon();
 				$value = $this->value();
+				$factor = 1e-2;
 				
-				$test_p = new Put($this->S,$this->K,$this->r,$this->t,$this->s,$this->V,$this->q + 0.0001);
-				$compare_p = $value + $epsilon / 100 - $test_p->value();
+				$test_p = new Put($this->S,$this->K,$this->r,$this->t,$this->s,$this->V,$this->q + 0.01 * $factor);
+				$compare_p = $value + $epsilon * $factor - $test_p->value();
 				
 				if (abs($compare_p) >= $tolerance) {
-					return new TestResult(false, "epsilon test failed",["base_option"=>$this,"test_option"=>$test_p,"error"=>$compare_p]);
+					return new TestResult(false, "epsilon test failed +",["base_option"=>$this,"test_option"=>$test_p,"error"=>$compare_p]);
 				}
 				
-				$test_m = new Put($this->S,$this->K,$this->r,$this->t,$this->s,$this->V,$this->q - 0.0001);
-				$compare_m = $value - $epsilon / 100 - $test_m->value();
+				$test_m = new Put($this->S,$this->K,$this->r,$this->t,$this->s,$this->V,$this->q - 0.01 * $factor);
+				$compare_m = $value - $epsilon * $factor - $test_m->value();
 				
 				if (abs($compare_m) >= $tolerance) {
-					return new TestResult(false, "epsilon test failed",["base_option"=>$this,"test_option"=>$test_m,"error"=>$compare_m]);
+					return new TestResult(false, "epsilon test failed -",["base_option"=>$this,"test_option"=>$test_m,"error"=>$compare_m]);
 				}
 			}
 			
