@@ -19,7 +19,7 @@
 				$this->theta_test_implicit(),
 				$this->epsilon_test_implicit(),
 				$this->vega_test_explicit(),
-				//$this->vega_test_implicit(),
+				$this->vega_test_implicit(),
 				//$this->rho_test_explicit(),
 				//$this->rho_test_implicit(),
 			];
@@ -198,8 +198,6 @@
 			return new TestResult(true);
 		}
 		
-		
-		
 		public function vega_test_explicit(float $tolerance = 1e-4): TestResult {
 			
 			$base_option = new Put(100,100,.05,30.0/365,.25,null,0.01);
@@ -219,6 +217,37 @@
 		}
 		
 		
+		private function vega_test_implicit(float $tolerance = 1e-5): TestResult {
+			
+			$tmp_s = $this->s;
+			
+			foreach (range(0.01,3.0,0.01) as $i) {
+				
+				$this->s = $i;
+				
+				$vega = $this->vega();
+				$value = $this->value();
+				$factor = 1e-2;
+				
+				$test_p = new Put($this->S,$this->K,$this->r,$this->t,$this->s+$factor/100,$this->V,$this->q);
+				$compare_p = $value + $vega * $factor - $test_p->value();
+				
+				if (abs($compare_p) >= $tolerance) {
+					return new TestResult(false, "vega test failed +",["base_option"=>$this,"test_option"=>$test_p,"error"=>$compare_p]);
+				}
+				
+				$test_m = new Put($this->S,$this->K,$this->r,$this->t,$this->s-$factor/100,$this->V,$this->q);
+				$compare_m = $value - $vega * $factor - $test_m->value();
+				
+				if (abs($compare_m) >= $tolerance) {
+					return new TestResult(false, "vega test failed -",["base_option"=>$this,"test_option"=>$test_m,"error"=>$compare_m]);
+				}
+			}
+			
+			$this->s = $tmp_s;
+			
+			return new TestResult(true);
+		}
 		
 		
 		
