@@ -12,6 +12,7 @@
 		public function battery(): array {
 			
 			return [
+
 				$this->value_test_explicit(),
 				$this->delta_test_explicit(),
 				$this->delta_test_implicit(),
@@ -22,6 +23,9 @@
 				$this->vega_test_implicit(),
 				$this->rho_test_explicit(),
 				$this->rho_test_implicit(),
+
+				$this->vanna_test_dvegadspot_implicit(),
+				$this->vanna_test_ddeltadvol_implicit()
 			];
 		}
 		
@@ -121,7 +125,6 @@
 			
 			$tmp_t = $this->t;
 
-
 			foreach (range(1,40,1) as $j) {
 					
 				$this->t = $j/365;
@@ -144,7 +147,7 @@
 				}
 			}
 			
-			$this->t <- $tmp_t;
+			$this->t = $tmp_t;
 			
 			return new TestResult(true);
 		}
@@ -282,21 +285,77 @@
 			return new TestResult(true);
 		}
 		
-		private function vanna_test_implicit(float $tolerance = 1e-6): TestResult {
-			// not yet implemented
+		private function vanna_test_dvegadspot_implicit(float $tolerance = 1e-4): TestResult {
 			
-			////dvegadspot
-			//$C_vanna_test = new Call(100.01,100,.05,30.0/365,.25,null,0.01);
-			//echo $C->vega() * (1 + $C->vanna()/100) - $C_vanna_test->vega();
+			$tmp_S = $this->S;
+			$tmp_K = $this->K;
 			
-			//ddeltadvol
-			//$C_vanna_test_2 = new Call(100,100,.05,30.0/365,.2501,null,0.01);
-			//echo $C->delta() + $C->vanna()/100 - $C_vanna_test_2->delta();
-		}	
+			foreach (range(1,200,1) as $i) {
+				
+				$this->S = $i;
+				$this->K = $i;
+				$vanna = $this->vanna();
+				$vega = $this->vega();
+				$factor = 1e-2;
+				
+				$test_p = new Call($this->S+$factor,$this->S,$this->r,$this->t,$this->s,$this->V,$this->q);
+				$compare_p = $vega * (1 + $vanna * $factor) - $test_p->vega();
+				
+				if (abs($compare_p) >= $tolerance) {
+					return new TestResult(false, "vanna test failed",["base_option"=>$this,"test_option"=>$test_p,"error"=>$compare_p]);
+				}
+				
+				$test_m = new Call($this->S-$factor,$this->S,$this->r,$this->t,$this->s,$this->V,$this->q);
+				$compare_m = $vega * (1 - $vanna * $factor) - $test_p->vega();
+				
+				if (abs($compare_m) >= $tolerance) {
+					return new TestResult(false, "vanna test failed",["base_option"=>$this,"test_option"=>$test_m,"error"=>$compare_m]);
+				}
+			}
+			
+			$this->S = $tmp_S;
+			$this->K = $tmp_K;
+
+			return new TestResult(true);	
+		}
+		
+		private function vanna_test_ddeltadvol_implicit(float $tolerance = 1e-3): TestResult {
+			
+			$tmp_s = $this->s;
+			
+			foreach (range(0.25,2.5,0.01) as $i) {
+				
+				$this->s = $i;
+				$delta = $this->delta();
+				$vanna = $this->vanna();
+				$factor = 1e-2;
+				
+				$test_p = new Call($this->S,$this->K,$this->r,$this->t,$this->s + $factor / 100,$this->V,$this->q);
+				$compare_p = $delta + $vanna * $factor - $test_p->delta();
+				
+				if (abs($compare_p) >= $tolerance) {
+					return new TestResult(
+						false, 
+						"vanna test failed +",
+						["base_option"=>$this,"test_option"=>$test_p,"error"=>$compare_p]
+					);
+				}
+				
+				$test_m = new Call($this->S,$this->K,$this->r,$this->t,$this->s - $factor / 100,$this->V,$this->q);
+				$compare_m = $delta - $vanna * $factor - $test_m->delta();
+				
+				if (abs($compare_m) >= $tolerance) {
+					return new TestResult(false, "vanna test failed -",["base_option"=>$this,"test_option"=>$test_m,"error"=>$compare_m]);
+				}
+			}
+			
+			$this->s = $tmp_s;
+			
+			return new TestResult(true);	
+		}
 	}
 	
-	echo json_encode((new CallUnitTest(100,100,0.05,30/360,.25,null,0.01))->battery());
-	
+
 
 ?>
 

@@ -25,8 +25,6 @@
 			];
 		}
 		
-		
-		
 		public function value_test_explicit(float $known_value, Option $base_option, float $tolerance = 1e-5): TestResult {
 			
 			$predicted = $base_option->value();
@@ -300,10 +298,6 @@
 		
 		
 	}
-	
-	$P = new PutUnitTest(100,100,0.05,30/360,0.25,null,0.01);
-	echo json_encode($P->battery());
-	
 ?>
 
 
