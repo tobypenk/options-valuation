@@ -27,7 +27,7 @@
 			];
 		}
 		
-		public function value_test_explicit(float $known_value, Option $base_option, float $tolerance = 1e-5): TestResult {
+		private function value_test_explicit(float $known_value, Option $base_option, float $tolerance = 1e-5): TestResult {
 			
 			$predicted = $base_option->value();
 			$error = $predicted - $known_value;
@@ -43,7 +43,7 @@
 			}
 		}
 		
-		public function delta_test_explicit(float $known_value, Option $base_option, float $tolerance = 1e-6): TestResult {
+		private function delta_test_explicit(float $known_value, Option $base_option, float $tolerance = 1e-6): TestResult {
 			
 			$predicted = $base_option->delta();
 			$error = $predicted - $known_value;
@@ -59,7 +59,7 @@
 			}
 		}
 		
-		public function delta_test_implicit(float $tolerance = 1e-6): TestResult {
+		private function delta_test_implicit(float $tolerance = 1e-6): TestResult {
 			
 			$tmp_S = $this->S;
 			$tmp_K = $this->K;
@@ -97,7 +97,7 @@
 			return new TestResult(true);
 		}
 		
-		public function theta_test_explicit(float $known_value, Option $base_option, float $tolerance = 2e-3): TestResult {
+		private function theta_test_explicit(float $known_value, Option $base_option, float $tolerance = 2e-3): TestResult {
 			
 			$base_option = new Put(100,100,.05,30.0/365,.25,null,0.01);
 			$predicted = $base_option->theta();
@@ -114,7 +114,7 @@
 			}
 		}
 		
-		public function theta_test_implicit(float $tolerance = 1e-5): TestResult {
+		private function theta_test_implicit(float $tolerance = 1e-5): TestResult {
 			
 			/*
 				performs an implicit test of accuracy of theta, the change in option value with respect to 
@@ -163,7 +163,7 @@
 			return new TestResult(true);
 		}
 		
-		public function epsilon_test_implicit(float $tolerance = 1e-6): TestResult {
+		private function epsilon_test_implicit(float $tolerance = 1e-6): TestResult {
 			
 			/*
 				not yet done
@@ -198,7 +198,7 @@
 			return new TestResult(true);
 		}
 		
-		public function vega_test_explicit(float $known_value, float $tolerance = 1e-4): TestResult {
+		private function vega_test_explicit(float $known_value, float $tolerance = 1e-4): TestResult {
 			
 			$base_option = new Put(100,100,.05,30.0/365,.25,null,0.01);
 			$predicted = $base_option->vega();
