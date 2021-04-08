@@ -22,6 +22,8 @@
 				$this->vega_test_implicit(),
 				$this->rho_test_explicit(-0.0406),
 				$this->rho_test_implicit(),
+				$this->vanna_test_ddeltadvol_implicit(),
+				$this->vanna_test_dvegadspot_implicit()
 			];
 		}
 		
@@ -293,11 +295,81 @@
 			return new TestResult(true);
 		}
 		
+		private function vanna_test_dvegadspot_implicit(float $tolerance = 1e-4): TestResult {
+			
+			$tmp_S = $this->S;
+			$tmp_K = $this->K;
+			
+			foreach (range(1,200,1) as $i) {
+				
+				$this->S = $i;
+				$this->K = $i;
+				$vanna = $this->vanna();
+				$vega = $this->vega();
+				$factor = 1e-2;
+				
+				$test_p = new Put($this->S+$factor,$this->S,$this->r,$this->t,$this->s,$this->V,$this->q);
+				$compare_p = $vega * (1 + $vanna * $factor) - $test_p->vega();
+				
+				if (abs($compare_p) >= $tolerance) {
+					return new TestResult(false, "vanna test failed",["base_option"=>$this,"test_option"=>$test_p,"error"=>$compare_p]);
+				}
+				
+				$test_m = new Put($this->S-$factor,$this->S,$this->r,$this->t,$this->s,$this->V,$this->q);
+				$compare_m = $vega * (1 - $vanna * $factor) - $test_p->vega();
+				
+				if (abs($compare_m) >= $tolerance) {
+					return new TestResult(false, "vanna test failed",["base_option"=>$this,"test_option"=>$test_m,"error"=>$compare_m]);
+				}
+			}
+			
+			$this->S = $tmp_S;
+			$this->K = $tmp_K;
+
+			return new TestResult(true);	
+		}
 		
-		
-		
-		
+		private function vanna_test_ddeltadvol_implicit(float $tolerance = 1e-3): TestResult {
+			
+			$tmp_s = $this->s;
+			
+			foreach (range(0.25,2.5,0.01) as $i) {
+				
+				$this->s = $i;
+				$delta = $this->delta();
+				$vanna = $this->vanna();
+				$factor = 1e-2;
+				
+				$test_p = new Put($this->S,$this->K,$this->r,$this->t,$this->s + $factor / 100,$this->V,$this->q);
+				$compare_p = $delta + $vanna * $factor - $test_p->delta();
+				
+				if (abs($compare_p) >= $tolerance) {
+					return new TestResult(
+						false, 
+						"vanna test failed +",
+						["base_option"=>$this,"test_option"=>$test_p,"error"=>$compare_p]
+					);
+				}
+				
+				$test_m = new Put($this->S,$this->K,$this->r,$this->t,$this->s - $factor / 100,$this->V,$this->q);
+				$compare_m = $delta - $vanna * $factor - $test_m->delta();
+				
+				if (abs($compare_m) >= $tolerance) {
+					return new TestResult(false, "vanna test failed -",["base_option"=>$this,"test_option"=>$test_m,"error"=>$compare_m]);
+				}
+			}
+			
+			$this->s = $tmp_s;
+			
+			return new TestResult(true);	
+		}
 	}
+	
+	
+	
+	echo json_encode((new PutUnitTest(100,100,0.05,30/360,.25,null,0.01))->battery());
+
+	
 ?>
 
 
